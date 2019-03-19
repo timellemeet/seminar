@@ -39,6 +39,8 @@ class Network:
         for i in range(epochs):
             err = 0
             for j in range(samples):
+                if err == 'nan':
+                    print('help')
                 # forward propagation
                 output = x_train[j:j+1]
                 for layer in self.layers:

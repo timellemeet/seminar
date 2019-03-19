@@ -22,20 +22,22 @@ def test_soft_max_activation():
     print(x_loss)
     assert x_loss.size == 25
 
-@pytest.mark.skip()
+
 def test_cross_entropy_loss():
     y = np.array([[0, 0, 0, 0, 1, 0, 0, 0, 0, 0]])
     y_pred = softmax(np.array([[1, 1, 2, 3, 12, 4, 1, 1, 1, 1]]))
     loss = cross_entropy(y, y_pred)
     print(loss)
-    y_pred = softmax(np.array([[1, 1, 2, 3, 8, 4, 6, 1, 6, 1]]))
-    loss2 = cross_entropy(y, y_pred)
+    y_pred2 = softmax(np.array([[1, 1, 2, 3, 8, 4, 6, 1, 6, 1]]))
+    loss2 = cross_entropy(y, y_pred2)
     print(loss2)
     assert loss < loss2
     loss_deriv = cross_entropy_prime(y, y_pred)
+    loss_deriv2 = cross_entropy_prime(y, y_pred2)
     print(loss_deriv)
+    print(loss_deriv2)
 
-
+@pytest.mark.skip()
 def test_sigmoid_activation():
     x = np.ones(30)
     n = np.diag(x).shape
