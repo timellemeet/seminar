@@ -214,18 +214,26 @@ class Network:
         _, a = self._feed_forward(x)
         return a[self.n_layers]
 
+def vectorize(x):
+    result = np.zeros([1,10])
+    for i in np.nditer(x):
+        t = np.zeros([1,10])
+        t[0][int(i)] = 1
+        result = np.append(result, t, axis=0)
+    return result[1:]
+
 if __name__ == "__main__":
     from sklearn import datasets
     import sklearn.metrics
     np.random.seed(1)
-    data = datasets.load_digits()
+    img = np.genfromtxt("C:\\Users\\niels\\gitlab\\seminar\\src\\data\\mini.csv", delimiter=',')
+    x = img[1:-1]
+    labels = np.genfromtxt('C:\\Users\\niels\\gitlab\\seminar\\src\\data\\mini_label.csv', delimiter=',')
+    labels = labels[1:-1]
+    y = vectorize(labels)
 
-    x = data["data"]
-    y = data["target"]
-    y = np.eye(10)[y]
-
-    nn = Network((64, 15, 10), (Relu, Sigmoid))
-    nn.fit(x, y, loss=MSE, epochs=50, batch_size=15, learning_rate=1e-3)
+    nn = Network((784, 15, 10), (Relu, Sigmoid))
+    nn.fit(x, y, loss=MSE, epochs=1000, batch_size=40, learning_rate=1e-4)
 
     prediction = nn.predict(x)
 
