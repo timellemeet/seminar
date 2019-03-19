@@ -32,7 +32,26 @@ class Softmax:
         pass
 
 class CrossEntrophy:
-    pass
+    def __init__(self, activation_fn=None):
+        self.activation_fn = activation_fn
+
+    def activation(self, z):
+        return self.activation_fn.activation(z)
+
+    @staticmethod
+    def loss(y_true, y_pred):
+        pass
+
+    @staticmethod
+    def prime(y_true, y_pred):
+        pass
+
+    def delta(self, y_true, y_pred):
+        """
+        Back propagation error delta
+        :return: (array)
+        """
+        pass
 
 class Network:
     def __init__(self, inputs, layers, hiddenneuron, output, activations):
@@ -76,8 +95,9 @@ class Network:
     def fit(self, x, y_true, loss, epochs, batch_size, lr = 1e-03):
         pass
 
-    def predict(self):
-        pass
+    def predict(self, x):
+        _,a = self.feedforward(x)
+        return a[-1]
 
 
 
