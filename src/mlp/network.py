@@ -116,23 +116,23 @@ class Network:
         self.b = {}
         self.sigma = {}
         self.depth = layers
-        self.loss = None #specify in fit function
+        self.loss = MSE(activations[1]) #specify in fit function
         self.lr = 0
 
         #first layer
         self.w[1] = np.ones([inputs,hiddenneuron])*.05
-        self.b[1] = np.zeros(hiddenneuron)
+        self.b[1] = np.zeros([hiddenneuron,1])
         self.sigma[2] = activations[0]
 
         #other layers
         for i in range(1, layers):
             self.w[i+1] = np.ones([hiddenneuron,hiddenneuron])*.05
-            self.b[i+1] = np.zeros(hiddenneuron)
+            self.b[i+1] = np.zeros([hiddenneuron,1])
             self.sigma[i+2] = activations[0]
 
         #output layer
         self.w[layers+1] = np.ones([hiddenneuron, output])*.05
-        self.b[layers+1] = np.zeros(output)
+        self.b[layers+1] = np.zeros([output,1])
         self.sigma[layers+2] = activations[1]
 
     def feedforward(self,x):
@@ -146,12 +146,22 @@ class Network:
 
         #f(a) --> last entry == prediction
         h = {1: x}
+        _,batchsize = x.shape
+        ones = np.ones([1,batchsize])
 
-        for i in range(1, len(self.w)+1):
+        for i in range(1, self.depth+2):
             # current layer is i
             # activation layer is i+1
-            a[i + 1] = np.dot(h[i], self.w[i]) + self.b[i]
-            h[i + 1] = self.sigma[i + 1].activation(a[i + 1])
+            # a[i + 1] = np.dot(h[i], self.w[i]) + self.b[i]
+            temp = np.matmul(self.b[i], ones)
+            print("h matrix: {} \nw matrix: {} \nb vector: {} \nb matrix: {}"
+                  .format(h[i].shape, self.w[i].shape, self.b[i].shape, temp.shape))
+            a[i+1] = np.dot(self.w[i].T, h[i]) + temp
+            h[i+1] = self.sigma[i+1].activation(a[i+1])
+            print(a[i+1].shape)
+            print(h[i+1].shape)
+            # h[i + 1] = self.sigma[i + 1].activation(a[i + 1])
+
         return a, h
 
     def back_prop(self, a, h, y_true):
@@ -162,16 +172,20 @@ class Network:
         :param y_true:
         """
 
-        delta = self.loss.delta(y_true, h[self.depth+2])
+        delta = self.loss.delta(y_true=y_true, y_pred=h[self.depth+2])
         delta_next = 0
         #function (6)
-        dw = np.dot(h[self.depth+1].T, delta)
+        print("h matrix: {} \n delta shape: {}"
+              .format(h[self.depth+1].shape, delta.shape))
+        dw = np.dot(h[self.depth+1], delta.T)
 
         #backprop the other layers
-        for i in range(self.depth+2, 2, -1):
-            delta_next = self.sigma[i].prime(a[i]) * np.dot(self.w[i-1], delta)
-            dw_next = np.dot(h[i-1].T, delta)
-            self.weight_update(i-1, dw, delta)
+        for i in range(self.depth+1, 2, -1):
+            print("a matrix: {} \nw matrix: {} \n delta: {}"
+                  .format(a[i].shape, self.w[i].shape, delta.shape))
+            delta_next = self.sigma[i].prime(a[i]) * np.dot(self.w[i], delta)
+            dw_next = np.dot(h[i-1], delta.T)
+            self.weight_update(i, dw, delta)
             delta = delta_next
             dw = dw_next
 
@@ -183,7 +197,7 @@ class Network:
         :param dw:  partial a^(d) / partial w^(d) * delta
         :param delta: partial y_hat / partial a^(d) * partial C / partial y_hat
         """
-
+        print("delta: {} \n b: {}".format(delta.shape, self.b[index].shape))
         #not sure yet about update rule for bias term
         self.w[index] -= self.lr * dw
         self.b[index] -= self.lr * np.mean(delta,0)
@@ -235,15 +249,18 @@ def vectorize(x):
 
 def main():
     img = np.genfromtxt("C:\\Users\\niels\\gitlab\\seminar\\src\\data\\mini.csv", delimiter=',')
-    img = img[1:-1]
+    img = img[1:-1].T
     labels = np.genfromtxt('C:\\Users\\niels\\gitlab\\seminar\\src\\data\\mini_label.csv', delimiter=',')
     labels = labels[1:-1]
-    y_true = vectorize(labels)
+    y_true = vectorize(labels).T
 
-    nn = Network(784,1,34,10, (Relu, Sigmoid))
-    nn.fit(img,y_true, loss=MSE, epochs=100,batch_size=10)
-    for i in range(len(img)-990):
-        print("Prediction: {}, actual: {} \n".format(nn.predict(img[i]), y_true[i]))
+    nn = Network(784,2,34,10, (Relu, Sigmoid))
+    a, h = nn.feedforward(img)
+    nn.back_prop(a, h, y_true)
+    # nn.fit(img,y_true, loss=MSE, epochs=100,batch_size=10)
+    # for i in range(len(img)-990):
+    #     print("Prediction: {}, actual: {} \n".format(nn.predict(img[i]), y_true[i]))
+
 main()
 
 
