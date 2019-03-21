@@ -31,8 +31,8 @@ model.compile(
     metrics=['accuracy']
 )
 
-epochs = 20
-batch_size = 32
+epochs = 50
+batch_size = 316
 history = model.fit(x=x_train, y=y_train, batch_size=batch_size, epochs=epochs, validation_data=(x_test, y_test))
 
 plt.plot(history.history['acc'], label='training accuracy')
@@ -41,6 +41,7 @@ plt.title('Accuracy')
 plt.xlabel('epochs')
 plt.ylabel('accuracy')
 plt.legend()
+plt.show()
 
 
 plt.plot(history.history['loss'], label='training loss')
