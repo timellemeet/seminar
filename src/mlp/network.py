@@ -154,12 +154,12 @@ class Network:
             # activation layer is i+1
             # a[i + 1] = np.dot(h[i], self.w[i]) + self.b[i]
             temp = np.matmul(self.b[i], ones)
-            print("h matrix: {} \nw matrix: {} \nb vector: {} \nb matrix: {}"
-                  .format(h[i].shape, self.w[i].shape, self.b[i].shape, temp.shape))
+            # print("h matrix: {} \nw matrix: {} \nb vector: {} \nb matrix: {}"
+            #       .format(h[i].shape, self.w[i].shape, self.b[i].shape, temp.shape))
             a[i+1] = np.dot(self.w[i].T, h[i]) + temp
             h[i+1] = self.sigma[i+1].activation(a[i+1])
-            print(a[i+1].shape)
-            print(h[i+1].shape)
+            # print(a[i+1].shape)
+            # print(h[i+1].shape)
             # h[i + 1] = self.sigma[i + 1].activation(a[i + 1])
 
         return a, h
@@ -175,14 +175,14 @@ class Network:
         delta = self.loss.delta(y_true=y_true, y_pred=h[self.depth+2])
         delta_next = 0
         #function (6)
-        print("h matrix: {} \n delta shape: {}"
-              .format(h[self.depth+1].shape, delta.shape))
+        # print("h matrix: {} \n delta shape: {}"
+        #       .format(h[self.depth+1].shape, delta.shape))
         dw = np.dot(h[self.depth+1], delta.T)
 
         #backprop the other layers
         for i in range(self.depth+1, 2, -1):
-            print("a matrix: {} \nw matrix: {} \n delta: {}"
-                  .format(a[i].shape, self.w[i].shape, delta.shape))
+            # print("a matrix: {} \nw matrix: {} \n delta: {}"
+            #       .format(a[i].shape, self.w[i].shape, delta.shape))
             delta_next = self.sigma[i].prime(a[i]) * np.dot(self.w[i], delta)
             dw_next = np.dot(h[i-1], delta.T)
             self.weight_update(i, dw, delta)
@@ -197,15 +197,15 @@ class Network:
         :param dw:  partial a^(d) / partial w^(d) * delta
         :param delta: partial y_hat / partial a^(d) * partial C / partial y_hat
         """
-        print("delta: {} \n b: {}".format(delta.shape, self.b[index].shape))
+        # print("delta: {} \n b: {}".format(delta.shape, self.b[index].shape))
         #not sure yet about update rule for bias term
         self.w[index] -= self.lr * dw
-        self.b[index] -= self.lr * np.mean(delta,0)
+        self.b[index] -= self.lr * np.mean(delta)
 
 
 
 
-    def fit(self, x, y_true, loss, epochs, batch_size, lr = 1e-03):
+    def fit(self, x, y_true, loss, epochs, batch_size, lr = 1e-06):
         """
 
         :param x:
@@ -222,22 +222,22 @@ class Network:
             for j in range(x.shape[0] // batch_size):
                 k = j * batch_size
                 l = (j + 1) * batch_size
-                a, h = self.feedforward(x[k:l])
-                self.back_prop(a, h, y_true[k:l])
+                a, h = self.feedforward(x[:,k:l])
+                self.back_prop(a, h, y_true[:,k:l])
 
             if (i + 1) % 10 == 0:
+                print("Epoch: {}".format(i))
                 _, h = self.feedforward(x)
-                print("Loss: {}".format(self.loss.loss(y_true[i], h[self.depth + 2])))
+                print("Loss: {}".format(self.loss.loss(y_true, h[self.depth + 2])))
 
     def predict(self, x):
+        x = np.reshape(x, (-1,1))
         _,h = self.feedforward(x)
         return h[self.depth + 2]
 
 def test_softmax():
     print(Softmax.activation(np.array([1,2,3])))
     print(Softmax.prime(np.array([1,2,3])))
-
-test_softmax()
 
 def vectorize(x):
     result = np.zeros([1,10])
@@ -248,18 +248,18 @@ def vectorize(x):
     return result[1:]
 
 def main():
-    img = np.genfromtxt("C:\\Users\\niels\\gitlab\\seminar\\src\\data\\mini.csv", delimiter=',')
+    img = np.genfromtxt("C:\\Users\\niels\\gitlab\\seminar\\src\\data\\images.csv", delimiter=',')
     img = img[1:-1].T
-    labels = np.genfromtxt('C:\\Users\\niels\\gitlab\\seminar\\src\\data\\mini_label.csv', delimiter=',')
+    labels = np.genfromtxt('C:\\Users\\niels\\gitlab\\seminar\\src\\data\\labels.csv', delimiter=',')
     labels = labels[1:-1]
     y_true = vectorize(labels).T
 
-    nn = Network(784,2,34,10, (Relu, Sigmoid))
-    a, h = nn.feedforward(img)
-    nn.back_prop(a, h, y_true)
-    # nn.fit(img,y_true, loss=MSE, epochs=100,batch_size=10)
-    # for i in range(len(img)-990):
-    #     print("Prediction: {}, actual: {} \n".format(nn.predict(img[i]), y_true[i]))
+    nn = Network(784,2,300,10, (Relu, Sigmoid))
+    # a, h = nn.feedforward(img)
+    # nn.back_prop(a, h, y_true)
+    nn.fit(img,y_true, loss=MSE, epochs=100,batch_size=30)
+    for i in range(len(img.T)-990):
+        print("Prediction: {}, actual: {} \n".format(nn.predict(img[:,i]), labels[i]))
 
 main()
 
