@@ -12,6 +12,23 @@ class Network:
     def add(self, layer):
         self.layers.append(layer)
 
+    def setup_net(self,hidden_layers, activation,
+                  features, output_classes,
+                  activation_prime,
+                  loss_activation, loss_activation_prime,
+                  loss, loss_prime,
+                  FCLayer, ActivationLayer, LossLayer):
+        # fill it with several layers
+        self.add(FCLayer(features, hidden_layers[0]))
+        self.add(ActivationLayer(activation, activation_prime))
+
+        for i in range(1, len(hidden_layers)):
+            self.add(FCLayer(hidden_layers[i - 1], hidden_layers[i]))
+            self.add(ActivationLayer(activation, activation_prime))
+
+        self.add(FCLayer(hidden_layers[-1], output_classes))
+        self.add(LossLayer(loss_activation, loss_activation_prime, loss, loss_prime))
+
     # predict output for given input
     def predict(self, input_data):
         # sample dimension first
@@ -27,6 +44,16 @@ class Network:
             result.append(output)
 
         return result
+
+    def accuracy(self, x, errors, y_true, val_errors):
+        out = self.predict(x)
+        size = len(x)
+        # extract specific predicted number from output neuron probabilities
+        y_pred = np.zeros(len(x))
+        for i in range(size):
+            y_pred[i] = np.argmax(out[i:i + 1])
+
+        return accuracy_score(y_pred, y_true)
 
     # train the network
     def fit(self, x_train, y_train, x_val, y_val, epochs, learning_rate):
@@ -58,11 +85,12 @@ class Network:
 
             # calculate average error on all samples
             err /= samples
-            print('epoch %d/%d   training error=%f' % (i+1, epochs, err))
+
             # validate and save to epoch error lists
             val_error = self.validate(x_val, y_val, self.layers[-1].loss)
             val_errors.append(val_error)
             errors.append(err)
+            print('epoch %d/%d   training error=%f  validation error=%f' % (i+1, epochs, err, val_error))
         return errors, val_errors
 
     def validate(self, x_validation, y_validation, lossfunc):
