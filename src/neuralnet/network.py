@@ -1,3 +1,5 @@
+import math
+
 
 class Network:
     def __init__(self):
@@ -8,11 +10,6 @@ class Network:
     # add layer to network
     def add(self, layer):
         self.layers.append(layer)
-
-    # set loss to use
-    def use(self, loss, loss_prime):
-        self.loss = loss
-        self.loss_prime = loss_prime
 
     # predict output for given input
     def predict(self, input_data):
@@ -32,6 +29,8 @@ class Network:
 
     # train the network
     def fit(self, x_train, y_train, epochs, learning_rate):
+        errors = []
+
         # sample dimension first
         samples = len(x_train)
 
@@ -39,21 +38,25 @@ class Network:
         for i in range(epochs):
             err = 0
             for j in range(samples):
-                if err == 'nan':
-                    print('help')
                 # forward propagation
                 output = x_train[j:j+1]
                 for layer in self.layers:
                     output = layer.forward_propagation(output)
 
                 # compute loss (for display purpose only)
-                err += self.loss(y_train[j:j+1], output)
+                # the last layer is the loss layer
+                err += self.layers[-1].loss(y_train[j:j+1], output)
 
                 # backward propagation
-                error = self.loss_prime(y_train[j:j+1], output)
-                for layer in reversed(self.layers):
+                # start with last layer since it requires backprop through both the loss and activation function
+                error = self.layers[-1].delta(y_train[j:j+1], output)
+                # backprop through all subsequent layers, while also updating parameters
+                for layer in reversed(self.layers[:-1]):
                     error = layer.backward_propagation(error, learning_rate)
 
             # calculate average error on all samples
             err /= samples
             print('epoch %d/%d   error=%f' % (i+1, epochs, err))
+            # save to epoch error list
+            errors.append(err)
+        return errors

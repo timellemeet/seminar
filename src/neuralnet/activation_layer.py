@@ -9,6 +9,7 @@ class ActivationLayer(Layer):
         self.activation_prime = activation_prime
 
     # returns the activated input
+    # also stores both input and output for backprop
     def forward_propagation(self, input_data):
         self.input = input_data
         self.output = self.activation(self.input)
@@ -17,6 +18,4 @@ class ActivationLayer(Layer):
     # Returns input_error=dE/dX for a given output_error=dE/dY.
     # learning_rate is not used because there is no "learnable" parameters.
     def backward_propagation(self, output_error, learning_rate):
-        diag_matrix = self.activation_prime(self.input)
-        result = np.matmul(diag_matrix, output_error)
-        return result
+        return self.activation_prime(self.input) * output_error
