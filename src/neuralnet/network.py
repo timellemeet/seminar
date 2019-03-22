@@ -1,5 +1,6 @@
 import math
-
+import numpy as np
+from sklearn.metrics import accuracy_score
 
 class Network:
     def __init__(self):
@@ -28,8 +29,9 @@ class Network:
         return result
 
     # train the network
-    def fit(self, x_train, y_train, epochs, learning_rate):
+    def fit(self, x_train, y_train, x_val, y_val, epochs, learning_rate):
         errors = []
+        val_errors = []
 
         # sample dimension first
         samples = len(x_train)
@@ -56,7 +58,22 @@ class Network:
 
             # calculate average error on all samples
             err /= samples
-            print('epoch %d/%d   error=%f' % (i+1, epochs, err))
-            # save to epoch error list
+            print('epoch %d/%d   training error=%f' % (i+1, epochs, err))
+            # validate and save to epoch error lists
+            val_error = self.validate(x_val, y_val, self.layers[-1].loss)
+            val_errors.append(val_error)
             errors.append(err)
-        return errors
+        return errors, val_errors
+
+    def validate(self, x_validation, y_validation, lossfunc):
+        loss = 0
+        result = self.predict(x_validation)
+        validation_size = len(x_validation)
+        y_pred = np.zeros(validation_size)
+        y_actual = np.zeros(validation_size)
+        for i in range(validation_size):
+            y_pred[i] = np.argmax(result[i:i + 1])
+            y_actual[i] = np.argmax(y_validation[i:i+1])
+            loss += lossfunc(y_validation[i:i+1], result[i:i+1])
+        return loss / validation_size
+        # return 1-accuracy_score(y_pred, y_actual)

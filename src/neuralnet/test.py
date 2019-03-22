@@ -3,7 +3,7 @@ import pytest
 import numpy as np
 from neuralnet.loss_func import  *
 from neuralnet.activation_func import *
-import numpy as np
+from neuralnet.network import Network
 
 # Agent tests
 # This checks mostly the simple auxiliary methods as the main algorithm is too complex to unit test and was purely
