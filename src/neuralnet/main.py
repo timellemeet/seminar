@@ -4,21 +4,19 @@ import matplotlib.pyplot as plt
 
 from sklearn.metrics import accuracy_score
 
-from neuralnet.Layer import *
-from neuralnet.network import Network
-from neuralnet.activation_func import tanh, tanh_prime, sigmoid, sigmoid_prime, softmax, softmax_prime, relu, relu_prime
-from neuralnet.loss_func import mse, mse_prime, cross_entropy, cross_entropy_prime
-from neuralnet.data_func import vectorize_labels, k_fold
-from neuralnet.confusion_matrix import plot_confusion_matrix
+from .Layer import *
+from .network import Network
+from .activation_func import tanh, tanh_prime, sigmoid, sigmoid_prime, softmax, softmax_prime, relu, relu_prime
+from .loss_func import mse, mse_prime, cross_entropy, cross_entropy_prime
+from .data_func import vectorize_labels, k_fold
+from .confusion_matrix import plot_confusion_matrix
 
 # import data
-# change this to your local repo location and file names
-# change to small data set for testing, entire data set for measuring
-os.chdir("..")
-training = np.genfromtxt('data/mini.csv', delimiter=',')[1:-4]
-labels = vectorize_labels(np.genfromtxt('data/mini_label.csv', delimiter=',')[1:-4])
-test = np.genfromtxt('data/images_test.csv', delimiter=',')
-original_test_labels = np.genfromtxt('data/labels_test.csv', delimiter=',')
+dataset = np.load("../dataset.npz")
+training = dataset['arr_0'] #training_img
+labels = vectorize_labels(dataset['arr_2']) #training_labels
+test = dataset['arr_1'] #test_img
+original_test_labels  = dataset['arr_3'] #test_labels
 test_labels = vectorize_labels(original_test_labels)
 
 # normalize data
