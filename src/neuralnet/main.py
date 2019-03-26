@@ -1,9 +1,7 @@
 import numpy as np
 import os
 import matplotlib.pyplot as plt
-
 from sklearn.metrics import accuracy_score
-
 from Layer import *
 from network import Network
 from activation_func import tanh, tanh_prime, sigmoid, sigmoid_prime, softmax, softmax_prime, relu, relu_prime
@@ -58,7 +56,7 @@ fold_train_data, fold_train_labels, fold_val_data, fold_val_labels = k_fold(trai
 
 # train the model on training data and labels using specific hyper-parameters
 errors, val_errors = net.fit(fold_train_data, fold_train_labels, fold_val_data, fold_val_labels,
-                             epochs=epochs, learning_rate=learning_rate, batch_size=batch_size)
+                             epochs=epochs, learning_rate=learning_rate, batch_size=batch_size, momentum=True)
 
 # print the accuracy
 print("The test accuracy of the network is: {}"

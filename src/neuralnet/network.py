@@ -55,12 +55,12 @@ class Network:
 
         return accuracy_score(y_pred, y_true)
 
-    def update_parameters(self, learning_rate):
+    def update_parameters(self, learning_rate, momentum):
         for layer in reversed(self.layers[:-1]):
-            layer.update(learning_rate)
+            layer.update(learning_rate, momentum)
 
     # train the network
-    def fit(self, x_train, y_train, x_val, y_val, epochs, learning_rate, batch_size):
+    def fit(self, x_train, y_train, x_val, y_val, epochs, learning_rate, batch_size, momentum):
         errors = []
         val_errors = []
 
@@ -110,7 +110,7 @@ class Network:
                     for layer in reversed(self.layers[:-1]):
                         output_error = layer.backward_propagation(output_error, learning_rate, batch_size)
 
-                self.update_parameters(learning_rate)
+                self.update_parameters(learning_rate, momentum=momentum)
 
                 input_gradient /= batch_size
 

@@ -15,7 +15,7 @@ class Layer:
     def backward_propagation(self, output_error, learning_rate, batch_size=None):
         raise NotImplementedError
 
-    def update(self, learning_rate):
+    def update(self, learning_rate, momentum):
         pass
 
 #inherit from base class Layer
@@ -27,8 +27,10 @@ class FCLayer(Layer):
         self.bias = np.random.rand(1, output_size) - 0.5
         self.output_gradient = np.zeros(self.bias.shape[1]).reshape(1,-1)
         self.weights_gradient = np.zeros(self.weights.shape)
-        # self.v_weights_prev = np.zeros(self.weights.shape)
-        # self.v_bias_prev = np.zeros(self.bias.shape)
+
+        #momentum
+        self.prev_output_gradient = np.zeros(self.bias.shape[1]).reshape(1,-1)
+        self.prev_weights_gradient = np.zeros(self.weights.shape)
 
     # returns output for a given input
     # also stores input and output for further reference in backprop
@@ -53,11 +55,27 @@ class FCLayer(Layer):
         # self.v_bias_prev = v_bias
         return input_error
 
-    def update(self, learning_rate):
-        self.weights -= learning_rate * self.weights_gradient
-        self.bias -= learning_rate * self.output_gradient
-        self.weights_gradient = np.zeros(self.weights_gradient.shape)
-        self.output_gradient = np.zeros(self.output_gradient.shape)
+    def update(self, learning_rate, momentum):
+        if momentum:
+            v_weights = (learning_rate * self.weights_gradient + .9*self.prev_weights_gradient)
+            v_bias = (learning_rate * self.output_gradient + .9*self.prev_output_gradient)
+            self.weights -= v_weights
+            self.bias -= v_bias
+
+            #momentum
+            self.prev_weights_gradient = v_weights
+            self.prev_output_gradient = v_bias
+            #
+
+            self.weights_gradient = np.zeros(self.weights_gradient.shape)
+            self.output_gradient = np.zeros(self.output_gradient.shape)
+        else:
+            self.weights -= learning_rate * self.weights_gradient
+            self.bias -= learning_rate * self.output_gradient
+
+            self.weights_gradient = np.zeros(self.weights_gradient.shape)
+            self.output_gradient = np.zeros(self.output_gradient.shape)
+
 
 
 
@@ -69,6 +87,7 @@ class LossLayer(Layer):
         self.loss = loss
         self.loss_prime = loss_prime
         self.combined_back_prop = False
+        print(self.activation, self.loss)
         if self.activation == softmax and self.loss == cross_entropy:
             self.combined_back_prop = True
 
