@@ -4,12 +4,12 @@ import matplotlib.pyplot as plt
 
 from sklearn.metrics import accuracy_score
 
-from neuralnet.Layer import *
-from neuralnet.network import Network
-from neuralnet.activation_func import tanh, tanh_prime, sigmoid, sigmoid_prime, softmax, softmax_prime, relu, relu_prime
-from neuralnet.loss_func import mse, mse_prime, cross_entropy, cross_entropy_prime
-from neuralnet.data_func import vectorize_labels, k_fold
-from neuralnet.confusion_matrix import plot_confusion_matrix
+from Layer import *
+from network import Network
+from activation_func import tanh, tanh_prime, sigmoid, sigmoid_prime, softmax, softmax_prime, relu, relu_prime
+from loss_func import mse, mse_prime, cross_entropy, cross_entropy_prime
+from data_func import vectorize_labels, k_fold
+from confusion_matrix import plot_confusion_matrix
 
 # import data
 dataset = np.load("../dataset.npz")

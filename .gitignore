@@ -3,3 +3,6 @@ data/
 *.pyc
 dataset.npz
 src/dataset.npz
+.bashrc
+.profile
+cribe

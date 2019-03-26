@@ -1,6 +1,6 @@
 import numpy as np
-from neuralnet.activation_func import softmax
-from neuralnet.loss_func import cross_entropy
+from activation_func import softmax
+from loss_func import cross_entropy
 # Base class
 class Layer:
     def __init__(self):
