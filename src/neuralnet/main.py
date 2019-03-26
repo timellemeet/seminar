@@ -12,7 +12,7 @@ from neuralnet.data_func import vectorize_labels, k_fold
 from neuralnet.confusion_matrix import plot_confusion_matrix
 
 # import data
-dataset = np.load("../data/dataset.npz")
+dataset = np.load("../dataset.npz")
 training = dataset['arr_0']  # training_img
 labels = vectorize_labels(dataset['arr_2'])  # training_labels
 test = dataset['arr_1']  # test_img
