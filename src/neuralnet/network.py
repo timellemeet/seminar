@@ -55,6 +55,10 @@ class Network:
 
         return accuracy_score(y_pred, y_true)
 
+    def update_parameters(self, learning_rate):
+        for layer in reversed(self.layers[:-1]):
+            layer.update(learning_rate)
+
     # train the network
     def fit(self, x_train, y_train, x_val, y_val, epochs, learning_rate, batch_size):
         errors = []
@@ -79,7 +83,13 @@ class Network:
                 end_slice = k*batch_size
                 x_batch = x_shuffle[start_slice:end_slice]
                 y_batch = y_shuffle[start_slice:end_slice]
-                batch_error = np.zeros([1,10])
+                input_gradient = np.zeros([1,10])
+
+                # std_x = np.std(x_batch, axis=1).reshape(-1,1)
+                # mu_x = np.mean(x_batch, axis=1).reshape(-1,1)
+                #
+                # x_batch = (x_batch-mu_x)/std_x
+
 
                 for j in range(batch_size):
                     # forward propagation
@@ -91,17 +101,21 @@ class Network:
                     # the last layer is the loss layer
                     err += self.layers[-1].loss(y_batch[j:j+1], output)
 
-                    # backward propagation
+                     # backward propagation
                     # start with last layer since it requires backprop through both the loss and activation function
                     error = self.layers[-1].delta(y_batch[j:j+1], output)
-                    batch_error += error
+                    output_error = error
 
-                batch_error /= batch_size
+                    # backprop through all subsequent layers, while also updating parameters
+                    for layer in reversed(self.layers[:-1]):
+                        output_error = layer.backward_propagation(output_error, learning_rate, batch_size)
+
+                self.update_parameters(learning_rate)
+
+                input_gradient /= batch_size
 
 
-                # backprop through all subsequent layers, while also updating parameters
-                for layer in reversed(self.layers[:-1]):
-                    batch_error = layer.backward_propagation(batch_error, learning_rate)
+
 
             # calculate average error on all samples
             err /= samples

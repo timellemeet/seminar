@@ -42,8 +42,8 @@ output_classes = 10
 # hyper parameters
 learning_rate = 1e-2
 hidden_layers = [64]
-epochs = 20
-batch_size = 30
+epochs = 10
+batch_size = 32
 
 # set up the network with specified layers, loss, and activation
 net = Network()
