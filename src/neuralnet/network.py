@@ -56,32 +56,52 @@ class Network:
         return accuracy_score(y_pred, y_true)
 
     # train the network
-    def fit(self, x_train, y_train, x_val, y_val, epochs, learning_rate):
+    def fit(self, x_train, y_train, x_val, y_val, epochs, learning_rate, batch_size):
         errors = []
         val_errors = []
 
         # sample dimension first
         samples = len(x_train)
+        if samples%batch_size !=0:
+            raise Exception("Make sure samples ({}) % batch_size ({}) is 0, now {}".format(samples, batch_size, samples%batch_size))
 
         # training loop
         for i in range(epochs):
             err = 0
-            for j in range(samples):
-                # forward propagation
-                output = x_train[j:j+1]
-                for layer in self.layers:
-                    output = layer.forward_propagation(output)
+            seed = np.arange(samples)
+            np.random.shuffle(seed)
+            x_shuffle = x_train[seed]
+            y_shuffle = y_train[seed]
 
-                # compute loss (for display purpose only)
-                # the last layer is the loss layer
-                err += self.layers[-1].loss(y_train[j:j+1], output)
 
-                # backward propagation
-                # start with last layer since it requires backprop through both the loss and activation function
-                error = self.layers[-1].delta(y_train[j:j+1], output)
+            for k in range(1, samples//batch_size):
+                start_slice = (k-1)*batch_size
+                end_slice = k*batch_size
+                x_batch = x_shuffle[start_slice:end_slice]
+                y_batch = y_shuffle[start_slice:end_slice]
+                batch_error = np.zeros([1,10])
+
+                for j in range(batch_size):
+                    # forward propagation
+                    output = x_batch[j:j+1]
+                    for layer in self.layers:
+                        output = layer.forward_propagation(output)
+
+                    # compute loss (for display purpose only)
+                    # the last layer is the loss layer
+                    err += self.layers[-1].loss(y_batch[j:j+1], output)
+
+                    # backward propagation
+                    # start with last layer since it requires backprop through both the loss and activation function
+                    error = self.layers[-1].delta(y_batch[j:j+1], output)
+                    batch_error += error
+
+                batch_error /= batch_size
+
+
                 # backprop through all subsequent layers, while also updating parameters
                 for layer in reversed(self.layers[:-1]):
-                    error = layer.backward_propagation(error, learning_rate)
+                    batch_error = layer.backward_propagation(batch_error, learning_rate)
 
             # calculate average error on all samples
             err /= samples
