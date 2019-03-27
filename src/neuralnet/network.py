@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import time
 from Layer import *
 from sklearn.metrics import accuracy_score
 
@@ -72,6 +73,7 @@ class Network:
 
         # training loop
         for i in range(epochs):
+            start_time = time.time()
             seed = np.arange(samples)
             np.random.shuffle(seed)
             x_shuffle = x_train[seed]
@@ -85,7 +87,7 @@ class Network:
             val_errors.append(val_error)
             val_accs.append(val_acc)
             errors.append(err)
-            print('epoch %d/%d   training error=%f  validation error=%f validation accuracy=%f' % (i+1, epochs, err, val_error, val_acc))
+            print('epoch %d/%d   training error=%f  validation error=%f validation accuracy=%f ETA=%f' % (i+1, epochs, err, val_error, val_acc, (time.time()-start_time)*(epochs-(i+1))))
         return errors, val_errors, val_accs
 
     def train_epoch(self, i, x_shuffle, y_shuffle, samples, learning_rate, batch_size, momentum, weight_decay):

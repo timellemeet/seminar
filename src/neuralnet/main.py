@@ -34,7 +34,7 @@ net.setup_net(hidden_layers, features, output_classes,
               loss_activation=softmax, loss_activation_prime=softmax_prime,
               loss=cross_entropy, loss_prime=cross_entropy_prime)
 
-# prepare data for training
+# prepare data for training by selecting validation set
 fold_train_data, fold_train_labels, fold_val_data, fold_val_labels = k_fold(training, labels, k=5, n=5)
 
 # train the model on training data and labels using specific hyper-parameters
