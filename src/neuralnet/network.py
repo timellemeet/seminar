@@ -80,10 +80,10 @@ class Network:
             err = self.train_epoch(i, x_shuffle, y_shuffle, samples, learning_rate, batch_size, momentum)
 
             # validate and save to epoch error lists
-            val_error = self.validate(x_val, y_val, self.layers[-1].loss)
+            val_error, val_acc = self.validate(x_val, y_val, self.layers[-1].loss)
             val_errors.append(val_error)
             errors.append(err)
-            print('epoch %d/%d   training error=%f  validation error=%f' % (i+1, epochs, err, val_error))
+            print('epoch %d/%d   training error=%f  validation error=%f validation accuracy=%f' % (i+1, epochs, err, val_error, val_acc))
         return errors, val_errors
 
     def train_epoch(self, i, x_shuffle, y_shuffle, samples, learning_rate, batch_size, momentum):
@@ -135,5 +135,4 @@ class Network:
             y_actual[i] = np.argmax(y_validation[i:i+1])
             loss += lossfunc(y_validation[i:i+1], result[i:i+1])
 
-        return loss / validation_size
-        # return 1-accuracy_score(y_pred, y_actual)
+        return loss / validation_size, 1-accuracy_score(y_pred, y_actual)

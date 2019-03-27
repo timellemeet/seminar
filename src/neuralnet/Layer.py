@@ -87,7 +87,6 @@ class LossLayer(Layer):
         self.loss = loss
         self.loss_prime = loss_prime
         self.combined_back_prop = False
-        print(self.activation, self.loss)
         if self.activation == softmax and self.loss == cross_entropy:
             self.combined_back_prop = True
 
