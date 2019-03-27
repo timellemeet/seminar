@@ -15,7 +15,7 @@ class Layer:
     def backward_propagation(self, output_error, learning_rate, batch_size=None):
         raise NotImplementedError
 
-    def update(self, learning_rate, momentum):
+    def update(self, learning_rate, momentum, weight_decay):
         pass
 
 #inherit from base class Layer
@@ -55,12 +55,12 @@ class FCLayer(Layer):
         # self.v_bias_prev = v_bias
         return input_error
 
-    def update(self, learning_rate, momentum):
+    def update(self, learning_rate, momentum, weight_decay):
         if momentum:
             v_weights = (learning_rate * self.weights_gradient + .9*self.prev_weights_gradient)
             v_bias = (learning_rate * self.output_gradient + .9*self.prev_output_gradient)
-            self.weights -= v_weights
-            self.bias -= v_bias
+            self.weights = (1-learning_rate*weight_decay)*self.weights - v_weights
+            self.bias = (1-learning_rate*weight_decay)*self.bias - v_bias
 
             #momentum
             self.prev_weights_gradient = v_weights
@@ -70,8 +70,8 @@ class FCLayer(Layer):
             self.weights_gradient = np.zeros(self.weights_gradient.shape)
             self.output_gradient = np.zeros(self.output_gradient.shape)
         else:
-            self.weights -= learning_rate * self.weights_gradient
-            self.bias -= learning_rate * self.output_gradient
+            self.weights = (1-learning_rate*weight_decay)*self.weights - learning_rate * self.weights_gradient
+            self.bias = (1-learning_rate*weight_decay)*self.bias - learning_rate * self.output_gradient
 
             self.weights_gradient = np.zeros(self.weights_gradient.shape)
             self.output_gradient = np.zeros(self.output_gradient.shape)

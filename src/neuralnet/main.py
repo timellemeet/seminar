@@ -11,8 +11,8 @@ from confusion_matrix import plot_confusion_matrix
 
 # import data
 dataset = np.load("../dataset.npz")
-training = dataset['arr_0']  # training_img
-labels = vectorize_labels(dataset['arr_2'])  # training_labels
+training = dataset['arr_0'][:6000]  # training_img
+labels = vectorize_labels(dataset['arr_2'][:6000])  # training_labels
 test = dataset['arr_1']  # test_img
 original_test_labels = dataset['arr_3']  # test_labels
 test_labels = vectorize_labels(original_test_labels)
@@ -39,9 +39,10 @@ output_classes = 10
 
 # hyper parameters
 learning_rate = 5e-3
-hidden_layers = [32]
+hidden_layers = [300]
 epochs = 10
 batch_size = 32
+weight_decay = 0.01
 
 # set up the network with specified layers, loss, and activation
 net = Network()
@@ -56,7 +57,7 @@ fold_train_data, fold_train_labels, fold_val_data, fold_val_labels = k_fold(trai
 
 # train the model on training data and labels using specific hyper-parameters
 errors, val_errors = net.fit(fold_train_data, fold_train_labels, fold_val_data, fold_val_labels,
-                             epochs=epochs, learning_rate=learning_rate, batch_size=batch_size, momentum=True)
+                             epochs=epochs, learning_rate=learning_rate, batch_size=batch_size, momentum=True, weight_decay=weight_decay)
 
 # print the accuracy
 print("The test accuracy of the network is: {}"
