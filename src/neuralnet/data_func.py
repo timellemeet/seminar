@@ -19,3 +19,20 @@ def k_fold(training_data,training_labels, k, n):
     new_training_labels = np.concatenate((training_labels[n*foldsize:],training_labels[:(n-1)*foldsize]))
     return new_training_data, new_training_labels, validation_data, validation_labels
 
+
+def import_data(size=60000, normalize=True):
+    # import data
+    dataset = np.load("../dataset.npz")
+    training = dataset['arr_0'][:size]  # training_img
+    labels = vectorize_labels(dataset['arr_2'][:size])  # training_labels
+    test = dataset['arr_1']  # test_img
+    original_test_labels = dataset['arr_3']  # test_labels
+    test_labels = vectorize_labels(original_test_labels)
+    np.random.seed(10)
+
+    if normalize:
+        # normalize data
+        training /= 255
+        test /= 255
+
+    return training, labels, test, original_test_labels, test_labels

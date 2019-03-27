@@ -1,5 +1,6 @@
 import math
 import numpy as np
+from Layer import *
 from sklearn.metrics import accuracy_score
 
 class Network:
@@ -12,12 +13,11 @@ class Network:
     def add(self, layer):
         self.layers.append(layer)
 
-    def setup_net(self,hidden_layers, activation,
+    def setup_net(self, hidden_layers,
                   features, output_classes,
-                  activation_prime,
+                  activation, activation_prime,
                   loss_activation, loss_activation_prime,
-                  loss, loss_prime,
-                  FCLayer, ActivationLayer, LossLayer):
+                  loss, loss_prime):
         # fill it with several layers
         self.add(FCLayer(features, hidden_layers[0]))
         self.add(ActivationLayer(activation, activation_prime))
