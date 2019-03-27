@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import time
+import datetime
 from Layer import *
 from sklearn.metrics import accuracy_score
 
@@ -65,12 +66,14 @@ class Network:
         errors = []
         val_errors = []
         val_accs = []
-
+        epoch_times = []
+        
         # sample dimension first
         samples = len(x_train)
         if samples%batch_size !=0:
             raise Exception("Make sure samples ({}) % batch_size ({}) is 0, now {}".format(samples, batch_size, samples%batch_size))
-
+        
+        previous_epoch_time = 0
         # training loop
         for i in range(epochs):
             start_time = time.time()
@@ -81,13 +84,22 @@ class Network:
 
             # train one epoch
             err = self.train_epoch(i, x_shuffle, y_shuffle, samples, learning_rate, batch_size, momentum, weight_decay)
-
+            
             # validate and save to epoch error lists
             val_error, val_acc = self.validate(x_val, y_val, self.layers[-1].loss)
             val_errors.append(val_error)
             val_accs.append(val_acc)
             errors.append(err)
-            print('epoch %d/%d   training error=%f  validation error=%f validation accuracy=%f ETA=%f' % (i+1, epochs, err, val_error, val_acc, (time.time()-start_time)*(epochs-(i+1))))
+            epoch_time = time.time()-start_time
+            epoch_times.append(epoch_time)
+            epoch_time = np.mean(epoch_times)
+            time_pred_error = epoch_time-previous_epoch_time
+            eta = str(datetime.timedelta(seconds=round((epoch_time)*(epochs-(i+1)))))
+            print('epoch %d/%d   training error=%f  validation error=%f validation accuracy=%f ETA=%s tpe=%f'  % (i+1, epochs, err, val_error, val_acc, eta, time_pred_error))
+            previous_epoch_time = epoch_time
+        
+        print('Average epoch computational time: ',np.mean(epoch_times))
+        
         return errors, val_errors, val_accs
 
     def train_epoch(self, i, x_shuffle, y_shuffle, samples, learning_rate, batch_size, momentum, weight_decay):
