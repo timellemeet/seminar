@@ -1,4 +1,5 @@
 import numpy as np
+import numexpr as ne
 from activation_func import softmax
 from loss_func import cross_entropy
 # Base class
@@ -23,8 +24,9 @@ class FCLayer(Layer):
     # input_size = number of input neurons
     # output_size = number of output neurons
     def __init__(self, input_size, output_size):
-        self.weights = np.random.rand(input_size, output_size) - 0.5
-        self.bias = np.random.rand(1, output_size) - 0.5
+        #He et al. 2015 for weight initialization https://arxiv.org/pdf/1502.01852.pdf
+        self.weights = np.random.randn(input_size, output_size)*np.sqrt(2/output_size)
+        self.bias = np.zeros([1, output_size])
         self.output_gradient = np.zeros(self.bias.shape[1]).reshape(1,-1)
         self.weights_gradient = np.zeros(self.weights.shape)
 
@@ -41,9 +43,10 @@ class FCLayer(Layer):
 
     # computes dE/dW, dE/dB for a given output_error=dE/dY. Returns input_error=dE/dX.
     def backward_propagation(self, output_error, learning_rate, batch_size=None):
-        input_error = np.dot(output_error, self.weights.T)
+        input_error = np.dot(self.weights, output_error.T).T
         self.output_gradient += output_error/batch_size
-        self.weights_gradient += np.dot(self.input.T, output_error)/batch_size
+        dot = np.dot(self.input.T, output_error)
+        self.weights_gradient += dot / batch_size
         # dBias = output_error
 
         # update parameters
