@@ -38,8 +38,8 @@ features = 784
 output_classes = 10
 
 # hyper parameters
-learning_rate = 1e-2
-hidden_layers = [64]
+learning_rate = 5e-3
+hidden_layers = [32]
 epochs = 10
 batch_size = 32
 

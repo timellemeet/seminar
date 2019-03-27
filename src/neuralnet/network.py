@@ -71,54 +71,13 @@ class Network:
 
         # training loop
         for i in range(epochs):
-            err = 0
             seed = np.arange(samples)
             np.random.shuffle(seed)
             x_shuffle = x_train[seed]
             y_shuffle = y_train[seed]
 
-
-            for k in range(1, samples//batch_size):
-                start_slice = (k-1)*batch_size
-                end_slice = k*batch_size
-                x_batch = x_shuffle[start_slice:end_slice]
-                y_batch = y_shuffle[start_slice:end_slice]
-                input_gradient = np.zeros([1,10])
-
-                # std_x = np.std(x_batch, axis=1).reshape(-1,1)
-                # mu_x = np.mean(x_batch, axis=1).reshape(-1,1)
-                #
-                # x_batch = (x_batch-mu_x)/std_x
-
-
-                for j in range(batch_size):
-                    # forward propagation
-                    output = x_batch[j:j+1]
-                    for layer in self.layers:
-                        output = layer.forward_propagation(output)
-
-                    # compute loss (for display purpose only)
-                    # the last layer is the loss layer
-                    err += self.layers[-1].loss(y_batch[j:j+1], output)
-
-                     # backward propagation
-                    # start with last layer since it requires backprop through both the loss and activation function
-                    error = self.layers[-1].delta(y_batch[j:j+1], output)
-                    output_error = error
-
-                    # backprop through all subsequent layers, while also updating parameters
-                    for layer in reversed(self.layers[:-1]):
-                        output_error = layer.backward_propagation(output_error, learning_rate, batch_size)
-
-                self.update_parameters(learning_rate, momentum=momentum)
-
-                input_gradient /= batch_size
-
-
-
-
-            # calculate average error on all samples
-            err /= samples
+            # train one epoch
+            err = self.train_epoch(i, x_shuffle, y_shuffle, samples, learning_rate, batch_size, momentum)
 
             # validate and save to epoch error lists
             val_error = self.validate(x_val, y_val, self.layers[-1].loss)
@@ -126,6 +85,44 @@ class Network:
             errors.append(err)
             print('epoch %d/%d   training error=%f  validation error=%f' % (i+1, epochs, err, val_error))
         return errors, val_errors
+
+    def train_epoch(self, i, x_shuffle, y_shuffle, samples, learning_rate, batch_size, momentum):
+        err = 0
+        for k in range(1, samples // batch_size):
+            start_slice = (k - 1) * batch_size
+            end_slice = k * batch_size
+            x_batch = x_shuffle[start_slice:end_slice]
+            y_batch = y_shuffle[start_slice:end_slice]
+
+            # std_x = np.std(x_batch, axis=1).reshape(-1,1)
+            # mu_x = np.mean(x_batch, axis=1).reshape(-1,1)
+            #
+            # x_batch = (x_batch-mu_x)/std_x
+
+            for j in range(batch_size):
+                # forward propagation
+                output = x_batch[j:j + 1]
+                for layer in self.layers:
+                    output = layer.forward_propagation(output)
+
+                # compute loss (for display purpose only)
+                # the last layer is the loss layer
+                err += self.layers[-1].loss(y_batch[j:j + 1], output)
+
+                # backward propagation
+                # start with last layer since it requires backprop through both the loss and activation function
+                error = self.layers[-1].delta(y_batch[j:j + 1], output)
+                output_error = error
+
+                # backprop through all subsequent layers, while also updating parameters
+                for layer in reversed(self.layers[:-1]):
+                    output_error = layer.backward_propagation(output_error, learning_rate, batch_size)
+
+            self.update_parameters(learning_rate, momentum=momentum)
+
+        # calculate average error on all samples
+        err /= samples
+        return err
 
     def validate(self, x_validation, y_validation, lossfunc):
         loss = 0
@@ -137,5 +134,6 @@ class Network:
             y_pred[i] = np.argmax(result[i:i + 1])
             y_actual[i] = np.argmax(y_validation[i:i+1])
             loss += lossfunc(y_validation[i:i+1], result[i:i+1])
+
         return loss / validation_size
         # return 1-accuracy_score(y_pred, y_actual)
