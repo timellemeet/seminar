@@ -1,5 +1,4 @@
 import numpy as np
-import numexpr as ne
 from activation_func import softmax
 from loss_func import cross_entropy
 # Base class

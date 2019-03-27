@@ -63,6 +63,7 @@ class Network:
     def fit(self, x_train, y_train, x_val, y_val, epochs, learning_rate, batch_size, momentum, weight_decay):
         errors = []
         val_errors = []
+        val_accs = []
 
         # sample dimension first
         samples = len(x_train)
@@ -82,9 +83,10 @@ class Network:
             # validate and save to epoch error lists
             val_error, val_acc = self.validate(x_val, y_val, self.layers[-1].loss)
             val_errors.append(val_error)
+            val_accs.append(val_acc)
             errors.append(err)
             print('epoch %d/%d   training error=%f  validation error=%f validation accuracy=%f' % (i+1, epochs, err, val_error, val_acc))
-        return errors, val_errors
+        return errors, val_errors, val_accs
 
     def train_epoch(self, i, x_shuffle, y_shuffle, samples, learning_rate, batch_size, momentum, weight_decay):
         err = 0

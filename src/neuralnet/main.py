@@ -38,7 +38,7 @@ net.setup_net(hidden_layers, features, output_classes,
 fold_train_data, fold_train_labels, fold_val_data, fold_val_labels = k_fold(training, labels, k=5, n=5)
 
 # train the model on training data and labels using specific hyper-parameters
-errors, val_errors = net.fit(fold_train_data, fold_train_labels, fold_val_data, fold_val_labels,
+errors, val_errors, val_accs = net.fit(fold_train_data, fold_train_labels, fold_val_data, fold_val_labels,
                              max_epochs, learning_rate, batch_size, momentum, weight_decay)
 
 # print the accuracy
