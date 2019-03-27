@@ -39,7 +39,7 @@ output_classes = 10
 
 # hyper parameters
 learning_rate = 5e-3
-hidden_layers = [300]
+hidden_layers = [300, 200, 100]
 epochs = 10
 batch_size = 32
 weight_decay = 0.01
