@@ -11,7 +11,7 @@ from confusion_matrix import plot_confusion_matrix
 
 # import data
 dataset = np.load("../dataset.npz")
-training = dataset['arr_0'][:6000]  # training_img
+training = dataset['arr_0'][:6000] # training_img
 labels = vectorize_labels(dataset['arr_2'][:6000])  # training_labels
 test = dataset['arr_1']  # test_img
 original_test_labels = dataset['arr_3']  # test_labels
