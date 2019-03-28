@@ -11,7 +11,7 @@ from performance_func import plot_error, plot_confusion_matrix
 
 
 # import data
-training_size = 6000
+training_size = 3000
 normalize = True
 training, labels, test, original_test_labels, test_labels = import_data(size=training_size, normalize=normalize)
 
@@ -22,14 +22,13 @@ output_classes = 10
 # hyper parameters
 learning_rate = 5e-3
 hidden_layers = [30]
-max_epochs = 10
+max_epochs = 5
 batch_size = 1
 weight_decay = 0.01
 momentum = False
 
 # set up the network with specified layers, loss, and activation
-net = Network()
-net.setup_net(hidden_layers, features, output_classes,
+net = Network(hidden_layers, features, output_classes,
               activation=relu, activation_prime=relu_prime,
               loss_activation=softmax, loss_activation_prime=softmax_prime,
               loss=cross_entropy, loss_prime=cross_entropy_prime)
@@ -50,4 +49,4 @@ print("The test accuracy of the network is: {}".format(
 #                       normalize=True,
 #                       title='Normalized confusion matrix')
 # plt.show()
-plot_error(errors, val_errors)
+#plot_error(errors, val_errors)
