@@ -2,10 +2,13 @@ from data_func import k_fold
 from network import Network
 
 class Queue:
-    def __init__(self, x, y):
+    def __init__(self, x, y, x_test, y_test, y_true):
         self.queue = []
         self.features = x
         self.labels = y
+        self.test_features = x_test
+        self.test_labels = y_test
+        self.original_test_labels = y_true
 
     def add(self,netparams, folds, params):
         for i in range(folds):
@@ -26,7 +29,6 @@ class Queue:
                 "params":params})
 
     def execute(self):
-        print(self.queue)
         results = [None] * len(self.queue)
         accuracies = [None] * len(self.queue)
         for i, val in enumerate(self.queue):
@@ -41,6 +43,6 @@ class Queue:
                              val["params"]["batch_size"],
                              val["params"]["momentum"],
                              val["params"]["weight_decay"])
-            accuracies[i] = val["network"].
+            accuracies[i] = val["network"].accuracy(self.test_features, self.original_test_labels)
 
-        return results
+        return results, accuracies

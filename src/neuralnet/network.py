@@ -45,7 +45,7 @@ class Network:
 
         return result
 
-    def accuracy(self, x, errors, y_true, val_errors):
+    def accuracy(self, x, y_true):
         out = self.predict(x)
         size = len(x)
         # extract specific predicted number from output neuron probabilities
