@@ -4,6 +4,8 @@ import time
 import datetime
 from Layer import *
 from sklearn.metrics import accuracy_score
+from loss_func import cross_entropy
+import matplotlib.pyplot as plt
 
 class Network:
     def __init__(self):
@@ -47,7 +49,7 @@ class Network:
 
         return result
 
-    def accuracy(self, x, errors, y_true, val_errors):
+    def accuracy(self, x, y_true):
         out = self.predict(x)
         size = len(x)
         # extract specific predicted number from output neuron probabilities
@@ -56,6 +58,17 @@ class Network:
             y_pred[i] = np.argmax(out[i:i + 1])
 
         return accuracy_score(y_pred, y_true)
+
+    def top_losses(self,x,y_true, tops):
+        y_pred = self.predict(x)
+        losses = []
+        for i in range(len(y_pred)):
+            losses.append(cross_entropy(y_true[i], y_pred[i]))
+        top = np.argsort(np.array(losses))[-tops:]
+        for i in top:
+            print("loss: {}, true: {}, predicted: {}".format(losses[i], np.argmax(y_true[i,:]), np.argmax(y_pred[i]) ))
+            plt.imshow(x[i].reshape(28, 28), cmap='gray')
+            plt.show()
 
     def update_parameters(self, learning_rate, momentum, weight_decay):
         for layer in reversed(self.layers[:-1]):

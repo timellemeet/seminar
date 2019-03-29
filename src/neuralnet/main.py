@@ -11,7 +11,7 @@ from performance_func import plot_error, plot_confusion_matrix
 
 
 # import data
-training_size = 6000
+training_size = 60000
 normalize = True
 training, labels, test, original_test_labels, test_labels = import_data(size=training_size, normalize=normalize)
 
@@ -23,9 +23,9 @@ output_classes = 10
 learning_rate = 5e-3
 hidden_layers = [30]
 max_epochs = 10
-batch_size = 1
+batch_size = 32
 weight_decay = 0.01
-momentum = False
+momentum = True
 
 # set up the network with specified layers, loss, and activation
 net = Network()
@@ -40,10 +40,10 @@ fold_train_data, fold_train_labels, fold_val_data, fold_val_labels = k_fold(trai
 # train the model on training data and labels using specific hyper-parameters
 errors, val_errors, val_accs = net.fit(fold_train_data, fold_train_labels, fold_val_data, fold_val_labels,
                              max_epochs, learning_rate, batch_size, momentum, weight_decay)
-
 # print the accuracy
 print("The test accuracy of the network is: {}".format(
-      net.accuracy(x=test, y_true=original_test_labels, errors=errors, val_errors=val_errors)))
+      net.accuracy(x=test, y_true=original_test_labels)))
+test_losses = net.top_losses(test, test_labels, 10)
 
 # # plot and print performance measures
 # plot_confusion_matrix(y_pred, original_test_labels[:test_size], classes=np.array([0,1,2,3,4,5,6,7,8,9]),
