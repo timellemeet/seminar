@@ -98,7 +98,7 @@ class Network:
         
         print('Average epoch computational time: ',np.mean(epoch_times))
         
-        return errors, val_errors, val_accs
+        return [errors, val_errors, val_accs]
 
     def train_epoch(self, i, x_shuffle, y_shuffle, samples, learning_rate, batch_size, momentum, weight_decay):
         err = 0

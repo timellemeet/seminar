@@ -8,16 +8,21 @@ def vectorize_labels(labels):
     return vector_labels
 
 
-def k_fold(training_data,training_labels, k, n):
+def k_fold(training_data,training_labels, k, i):
     observations,__ = training_labels.shape
     if observations%k != 0:
         raise Exception("Difficult division, make sure {}%{} is zero".format(observations,k))
     foldsize = int(observations/k)
-    validation_data = training_data[(n-1)*foldsize:n*foldsize]
-    validation_labels = training_labels[(n-1)*foldsize:n*foldsize]
-    new_training_data = np.concatenate((training_data[n*foldsize:],training_data[:(n-1)*foldsize]))
-    new_training_labels = np.concatenate((training_labels[n*foldsize:],training_labels[:(n-1)*foldsize]))
-    return new_training_data, new_training_labels, validation_data, validation_labels
+    validation_data = training_data[(i-1)*foldsize:i*foldsize]
+    validation_labels = training_labels[(i-1)*foldsize:i*foldsize]
+    new_training_data = np.concatenate((training_data[i*foldsize:],training_data[:(i-1)*foldsize]))
+    new_training_labels = np.concatenate((training_labels[i*foldsize:],training_labels[:(i-1)*foldsize]))
+    return {
+        "x_train":new_training_data,
+        "y_train":new_training_labels,
+        "x_val":validation_data,
+        "y_val":validation_labels
+    }
 
 
 def import_data(size=60000, normalize=True):
