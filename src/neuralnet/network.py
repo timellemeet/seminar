@@ -8,20 +8,14 @@ from loss_func import cross_entropy
 import matplotlib.pyplot as plt
 
 class Network:
-    def __init__(self):
-        self.layers = []
-        self.loss = None
-        self.loss_prime = None
-
-    # add layer to network
-    def add(self, layer):
-        self.layers.append(layer)
-
-    def setup_net(self, hidden_layers,
+    def __init__(self, hidden_layers,
                   features, output_classes,
                   activation, activation_prime,
                   loss_activation, loss_activation_prime,
                   loss, loss_prime):
+        self.layers = []
+        self.loss = None
+        self.loss_prime = None
         # fill it with several layers
         self.add(FCLayer(features, hidden_layers[0]))
         self.add(ActivationLayer(activation, activation_prime))
@@ -32,6 +26,10 @@ class Network:
 
         self.add(FCLayer(hidden_layers[-1], output_classes))
         self.add(LossLayer(loss_activation, loss_activation_prime, loss, loss_prime))
+
+    # add layer to network
+    def add(self, layer):
+        self.layers.append(layer)
 
     # predict output for given input
     def predict(self, input_data):
@@ -113,7 +111,7 @@ class Network:
         
         print('Average epoch computational time: ',np.mean(epoch_times))
         
-        return errors, val_errors, val_accs
+        return [errors, val_errors, val_accs]
 
     def train_epoch(self, i, x_shuffle, y_shuffle, samples, learning_rate, batch_size, momentum, weight_decay):
         err = 0

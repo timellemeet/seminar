@@ -7,3 +7,5 @@ src/dataset.npz
 .profile
 cribe
 src/neuralnet/.ipynb_checkpoints/
+ve/
+venv/
