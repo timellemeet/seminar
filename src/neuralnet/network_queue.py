@@ -10,10 +10,11 @@ class Queue:
         self.test_labels = y_test
         self.original_test_labels = y_true
 
-    def add(self,netparams, folds, params):
+    def add(self,description,netparams, folds, params):
         for i in range(folds):
             data = k_fold(self.features, self.labels, k=folds, i=i+1)
             self.queue.append({
+                "description": description + " - Fold "+str(i+1),
                 "network":Network(
                     netparams["hidden_layers"],
                     netparams["features"],
@@ -26,14 +27,14 @@ class Queue:
                     netparams["loss_prime"],
                 ),
                 "data":data,
-                "params":params})
+                "params":params,
+                "results":None,
+                "accuracies":None})
 
     def execute(self):
-        results = [None] * len(self.queue)
-        accuracies = [None] * len(self.queue)
         for i, val in enumerate(self.queue):
             print("Fitting model %d/%d" %(i+1,len(self.queue)))
-            results[i] = val["network"].fit(
+            self.queue[i]["results"] = val["network"].fit(
                             val["data"]["x_train"],
                              val["data"]["y_train"],
                              val["data"]["x_val"],
@@ -43,6 +44,6 @@ class Queue:
                              val["params"]["batch_size"],
                              val["params"]["momentum"],
                              val["params"]["weight_decay"])
-            accuracies[i] = val["network"].accuracy(self.test_features, self.original_test_labels)
+            self.queue[i]["accuracies"]= val["network"].accuracy(self.test_features, self.original_test_labels)
 
-        return results, accuracies
+        return self.queue
