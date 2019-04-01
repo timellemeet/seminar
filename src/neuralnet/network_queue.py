@@ -45,5 +45,5 @@ class Queue:
                              val["params"]["momentum"],
                              val["params"]["weight_decay"])
             self.queue[i]["accuracies"]= val["network"].accuracy(self.test_features, self.original_test_labels)
-
+            del self.queue[i]["data"]
         return self.queue

@@ -104,9 +104,8 @@ class Network:
             epoch_time = time.time()-start_time
             epoch_times.append(epoch_time)
             epoch_time = np.mean(epoch_times)
-            time_pred_error = epoch_time-previous_epoch_time
             eta = str(datetime.timedelta(seconds=round((epoch_time)*(epochs-(i+1)))))
-            print('epoch %d/%d   training error=%f  validation error=%f validation accuracy=%f ETA=%s tpe=%f'  % (i+1, epochs, err, val_error, val_acc, eta, time_pred_error))
+            print('epoch %d/%d   training error=%f  validation error=%f validation accuracy=%f ETA=%s'  % (i+1, epochs, err, val_error, val_acc, eta))
             previous_epoch_time = epoch_time
         
         print('Average epoch computational time: ',np.mean(epoch_times))
