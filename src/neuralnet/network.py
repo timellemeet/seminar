@@ -165,3 +165,21 @@ class Network:
             loss += lossfunc(y_validation[i:i+1], result[i:i+1])
 
         return loss / validation_size, accuracy_score(y_pred, y_actual)
+
+    def save_parameters(self, name):
+        path = '../networks/' +name
+        np.savez(path,*[layer.weights for layer in self.layers if type(layer) == FCLayer], *[layer.bias for layer in self.layers if type(layer) == FCLayer])
+
+    def load_parameters(self,file):
+        parameters = np.load(file)
+
+        i = 0
+        for layer in self.layers:
+            if type(layer) == FCLayer:
+                s = parameters['arr_'+str(i)].shape
+                if layer.weights.shape == parameters['arr_'+str(i)].shape:
+                    layer.weights = parameters['arr_'+str(i)]
+                    layer.bias = parameters['arr_'+ str(i+len(self.layers)//2)]
+                    i+=1
+                else:
+                    raise Exception("Shape error, amount of neurons and layers in network unequal to network trying to load")

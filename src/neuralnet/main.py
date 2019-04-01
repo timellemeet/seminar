@@ -40,6 +40,7 @@ fold_train_data, fold_train_labels, fold_val_data, fold_val_labels = k_fold(trai
 # train the model on training data and labels using specific hyper-parameters
 errors, val_errors, val_accs = net.fit(fold_train_data, fold_train_labels, fold_val_data, fold_val_labels,
                              max_epochs, learning_rate, batch_size, momentum, weight_decay)
+net.save_parameters("%s HU, %f LR, %d epochs, %d batchsize, %f weightdecay, %g momentum" %(hidden_layers, learning_rate, max_epochs, batch_size, weight_decay, momentum))
 # print the accuracy
 print("The test accuracy of the network is: {}".format(
       net.accuracy(x=test, y_true=original_test_labels)))
