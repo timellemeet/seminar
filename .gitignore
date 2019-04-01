@@ -6,3 +6,4 @@ src/dataset.npz
 .bashrc
 .profile
 cribe
+src/neuralnet/.ipynb_checkpoints/
