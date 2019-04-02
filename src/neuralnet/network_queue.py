@@ -1,9 +1,13 @@
 from data_func import k_fold
 from network import Network
+import numpy as np
+import time
+
 
 class Queue:
     def __init__(self, x, y, x_test, y_test, y_true):
         self.queue = []
+        self.filenames = []
         self.features = x
         self.labels = y
         self.test_features = x_test
@@ -11,6 +15,7 @@ class Queue:
         self.original_test_labels = y_true
 
     def add(self,description,netparams, folds, params):
+        self.filenames.append({"description":description,"folds":folds})
         for i in range(folds):
             data = k_fold(self.features, self.labels, k=folds, i=i+1)
             self.queue.append({
@@ -46,4 +51,17 @@ class Queue:
                              val["params"]["weight_decay"])
             self.queue[i]["accuracies"]= val["network"].accuracy(self.test_features, self.original_test_labels)
             del self.queue[i]["data"]
+        
+        self.save()
         return self.queue
+    
+    def save(self):
+        index = 0 
+        timestamp = time.strftime("%Y-%m-%d-%H%M%S")
+        
+#         np.save("Results/save-"+, self.filenames)
+        
+        for i, val in enumerate(self.filenames):
+            nextindex = index + val["folds"] - 1
+            np.save("Results/"+val["description"]+" - "+timestamp, self.queue[index:nextindex])
+            index = nextindex + 1

@@ -31,8 +31,7 @@ def sigmoid(x):
 
 # faulty output
 def sigmoid_prime(x):
-    sigm = sigmoid(x)*(1-sigmoid(x))
-    return np.diagflat(sigm)
+    return sigmoid(x)*(1-sigmoid(x))
 
 
 def softmax(x):
