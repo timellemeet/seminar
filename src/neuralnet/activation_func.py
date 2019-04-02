@@ -46,7 +46,26 @@ def softmax_prime(x):
     return softmax(x)*kron_delta - softmax(x)*softmax(x).T
 
 
+class ActivationFunction:
+    def __init__(self, act_func, func_prime, alpha=None):
+        self.func = act_func
+        self.func_prime = func_prime
+        self.alpha = alpha
+        self.parametric = False
+        if act_func == softmax:
+            self.parametric = True
 
+    def forward(self, x):
+        if self.parametric:
+            return self.func(x, self.alpha)
+        else:
+            return self.func(x)
+
+    def backward(self, x):
+        if self.parametric:
+            return self.func_prime(x, self.alpha)
+        else:
+            return self.func_prime(x)
 
 
 

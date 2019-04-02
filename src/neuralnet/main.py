@@ -11,7 +11,7 @@ from performance_func import plot_error, plot_confusion_matrix
 from network_queue import Queue
 np.random.seed(10)
 # import data
-training_size = 3000
+training_size = 6000
 normalize = True
 training, labels, test, original_test_labels, test_labels = import_data(size=training_size, normalize=normalize)
 

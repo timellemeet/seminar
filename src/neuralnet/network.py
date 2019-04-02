@@ -5,6 +5,7 @@ import datetime
 from Layer import *
 from sklearn.metrics import accuracy_score
 from loss_func import cross_entropy
+from activation_func import ActivationFunction
 import matplotlib.pyplot as plt
 
 class Network:
@@ -18,11 +19,11 @@ class Network:
         self.loss_prime = None
         # fill it with several layers
         self.add(FCLayer(features, hidden_layers[0]))
-        self.add(ActivationLayer(activation, activation_prime))
+        self.add(ActivationLayer(ActivationFunction(activation, activation_prime)))
 
         for i in range(1, len(hidden_layers)):
             self.add(FCLayer(hidden_layers[i - 1], hidden_layers[i]))
-            self.add(ActivationLayer(activation, activation_prime))
+            self.add(ActivationLayer(ActivationFunction(activation, activation_prime)))
 
         self.add(FCLayer(hidden_layers[-1], output_classes))
         self.add(LossLayer(loss_activation, loss_activation_prime, loss, loss_prime))
