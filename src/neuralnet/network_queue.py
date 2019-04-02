@@ -30,6 +30,7 @@ class Queue:
                     netparams["loss_activation_prime"],
                     netparams["loss"],
                     netparams["loss_prime"],
+                    netparams["activation_alpha"],
                 ),
                 "data":data,
                 "params":params,
