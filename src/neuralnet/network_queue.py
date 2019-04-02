@@ -60,8 +60,6 @@ class Queue:
         index = 0 
         timestamp = time.strftime("%Y-%m-%d-%H%M%S")
         
-#         np.save("Results/save-"+, self.filenames)
-        
         for i, val in enumerate(self.filenames):
             nextindex = index + val["folds"] - 1
             np.save("Results/"+val["description"]+" - "+timestamp, self.queue[index:nextindex])
