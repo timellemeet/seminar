@@ -13,17 +13,17 @@ class Network:
                   features, output_classes,
                   activation, activation_prime,
                   loss_activation, loss_activation_prime,
-                  loss, loss_prime):
+                  loss, loss_prime, activation_alpha=None):
         self.layers = []
         self.loss = None
         self.loss_prime = None
         # fill it with several layers
         self.add(FCLayer(features, hidden_layers[0]))
-        self.add(ActivationLayer(ActivationFunction(activation, activation_prime)))
+        self.add(ActivationLayer(ActivationFunction(activation, activation_prime, activation_alpha)))
 
         for i in range(1, len(hidden_layers)):
             self.add(FCLayer(hidden_layers[i - 1], hidden_layers[i]))
-            self.add(ActivationLayer(ActivationFunction(activation, activation_prime)))
+            self.add(ActivationLayer(ActivationFunction(activation, activation_prime, activation_alpha)))
 
         self.add(FCLayer(hidden_layers[-1], output_classes))
         self.add(LossLayer(loss_activation, loss_activation_prime, loss, loss_prime))
