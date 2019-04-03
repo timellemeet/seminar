@@ -2,6 +2,7 @@ from pathvalidate import sanitize_filename
 from data_func import k_fold
 from network import Network
 import numpy as np
+import os
 import time
 
 
@@ -38,7 +39,7 @@ class Queue:
                 "results":None,
                 "accuracies":None})
 
-    def execute(self):
+    def execute(self, save=True, folder="Results"):
         infoindex = 0
         startindex = 0
         endindex = self.info[infoindex]["folds"] - 1
@@ -56,14 +57,15 @@ class Queue:
                              val["params"]["momentum"],
                              val["params"]["weight_decay"])
             self.queue[i]["accuracies"]= val["network"].accuracy(self.test_features, self.original_test_labels)
+            print("Model accuracy ",self.queue[i]["accuracies"])
             del self.queue[i]["data"]
             
             
             #save folded batch
-            if endindex == i:
+            if save and endindex == i:
                 timestamp = time.strftime("%Y-%m-%d-%H%M%S")
-                
-                np.save("Results/"+sanitize_filename(
+                os.makedirs(folder, exist_ok=True)
+                np.save(folder+"/"+sanitize_filename(
                     self.info[infoindex]["description"]
                     +" - layers "+str(self.info[infoindex]["netparams"]["hidden_layers"])
                     +" - training_size "+str(self.labels.shape[0])

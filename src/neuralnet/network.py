@@ -109,9 +109,11 @@ class Network:
             print('epoch %d/%d   training error=%f  validation error=%f validation accuracy=%f ETA=%s'  % (i+1, epochs, err, val_error, val_acc, eta))
             previous_epoch_time = epoch_time
         
-        print('Average epoch computational time: ',np.mean(epoch_times))
+        #average epoch time
+        apt = np.mean(epoch_times)
+        print('Average epoch computational time: ',apt)
         
-        return [errors, val_errors, val_accs]
+        return {"errors":errors, "val_errors":val_errors, "val_accs":val_accs, "apt":apt}
 
     def train_epoch(self, i, x_shuffle, y_shuffle, samples, learning_rate, batch_size, momentum, weight_decay):
         err = 0
