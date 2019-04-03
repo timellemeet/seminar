@@ -39,6 +39,10 @@ class Queue:
                 "accuracies":None})
 
     def execute(self):
+        infoindex = 0
+        startindex = 0
+        endindex = self.info[infoindex]["folds"] - 1
+        
         for i, val in enumerate(self.queue):
             print("Fitting model %d/%d" %(i+1,len(self.queue)))
             self.queue[i]["results"] = val["network"].fit(
@@ -53,22 +57,25 @@ class Queue:
                              val["params"]["weight_decay"])
             self.queue[i]["accuracies"]= val["network"].accuracy(self.test_features, self.original_test_labels)
             del self.queue[i]["data"]
+            
+            
+            #save folded batch
+            if endindex == i:
+                timestamp = time.strftime("%Y-%m-%d-%H%M%S")
+                
+                np.save("Results/"+sanitize_filename(
+                    self.info[infoindex]["description"]
+                    +" - layers "+str(self.info[infoindex]["netparams"]["hidden_layers"])
+                    +" - training_size "+str(self.labels.shape[0])
+                    +" - epochs "+str(val["params"]["epochs"])
+                    +" - learning_rate "+str(val["params"]["learning_rate"])
+                    +" - "+timestamp), 
+                        self.queue[startindex:endindex])
+                
+                if i < len(self.queue) - 1:
+                    startindex = endindex + 1
+                    infoindex += 1
+                    endindex += self.info[infoindex]["folds"]
         
-        self.save()
         return self.queue
     
-    def save(self):
-        index = 0 
-        timestamp = time.strftime("%Y-%m-%d-%H%M%S")
-        
-        for i, val in enumerate(self.info):
-            nextindex = index + val["folds"] - 1
-            np.save("Results/"+sanitize_filename(
-                val["description"]
-                +" - layers "+str(val["netparams"]["hidden_layers"])
-                +" - training_size "+str(self.labels.shape[0])
-                +" - epochs "+str(val["params"]["epochs"])
-                +" - learning_rate "+str(val["params"]["learning_rate"])
-                +" - "+timestamp), 
-                    self.queue[index:nextindex])
-            index = nextindex + 1
