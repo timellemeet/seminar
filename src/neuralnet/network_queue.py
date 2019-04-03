@@ -8,7 +8,7 @@ import time
 class Queue:
     def __init__(self, x, y, x_test, y_test, y_true):
         self.queue = []
-        self.filenames = []
+        self.info = []
         self.features = x
         self.labels = y
         self.test_features = x_test
@@ -16,7 +16,7 @@ class Queue:
         self.original_test_labels = y_true
 
     def add(self,description,netparams, folds, params):
-        self.filenames.append({"description":description,"layers":netparams["hidden_layers"], "folds":folds})
+        self.info.append({"description":description, "folds":folds, "netparams":netparams , "params":params })
         for i in range(folds):
             data = k_fold(self.features, self.labels, k=folds, i=i+1)
             self.queue.append({
@@ -61,7 +61,14 @@ class Queue:
         index = 0 
         timestamp = time.strftime("%Y-%m-%d-%H%M%S")
         
-        for i, val in enumerate(self.filenames):
+        for i, val in enumerate(self.info):
             nextindex = index + val["folds"] - 1
-            np.save("Results/"+sanitize_filename(val["description"]+" - architecture "+str(val["layers"])+" - training_size "+str(self.labels.shape[0])+" - "+timestamp), self.queue[index:nextindex])
+            np.save("Results/"+sanitize_filename(
+                val["description"]
+                +" - layers "+str(val["netparams"]["hidden_layers"])
+                +" - training_size "+str(self.labels.shape[0])
+                +" - epochs "+str(val["params"]["epochs"])
+                +" - learning_rate "+str(val["params"]["learning_rate"])
+                +" - "+timestamp), 
+                    self.queue[index:nextindex])
             index = nextindex + 1
