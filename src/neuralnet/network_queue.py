@@ -1,3 +1,4 @@
+from pathvalidate import sanitize_filename
 from data_func import k_fold
 from network import Network
 import numpy as np
@@ -15,7 +16,7 @@ class Queue:
         self.original_test_labels = y_true
 
     def add(self,description,netparams, folds, params):
-        self.filenames.append({"description":description,"folds":folds})
+        self.filenames.append({"description":description,"layers":netparams["hidden_layers"], "folds":folds})
         for i in range(folds):
             data = k_fold(self.features, self.labels, k=folds, i=i+1)
             self.queue.append({
@@ -62,5 +63,5 @@ class Queue:
         
         for i, val in enumerate(self.filenames):
             nextindex = index + val["folds"] - 1
-            np.save("Results/"+val["description"]+" - "+timestamp, self.queue[index:nextindex])
+            np.save("Results/"+sanitize_filename(val["description"]+" - architecture "+str(val["layers"])+" - training_size "+str(self.labels.shape[0])+" - "+timestamp), self.queue[index:nextindex])
             index = nextindex + 1
