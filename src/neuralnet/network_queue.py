@@ -9,7 +9,6 @@ import time
 class Queue:
     def __init__(self, x, y, x_test, y_test, y_true):
         self.queue = []
-        self.info = []
         self.features = x
         self.labels = y
         self.test_features = x_test
@@ -17,7 +16,6 @@ class Queue:
         self.original_test_labels = y_true
 
     def add(self,description,netparams, folds, params):
-        self.info.append({"description":description, "folds":folds, "netparams":netparams , "params":params })
         for i in range(folds):
             data = k_fold(self.features, self.labels, k=folds, i=i+1)
             self.queue.append({
@@ -36,13 +34,14 @@ class Queue:
                 ),
                 "data":data,
                 "params":params,
+                "info": {"description":description, "folds":folds, "netparams":netparams , "params":params },
                 "results":None,
-                "accuracies":None})
+                "accuracies":None,
+            })
 
     def execute(self, save=True, folder="Results"):
-        infoindex = 0
         startindex = 0
-        endindex = self.info[infoindex]["folds"] - 1
+        endindex = self.queue[startindex]["info"]["folds"] - 1
         
         for i, val in enumerate(self.queue):
             print("Fitting model %d/%d" %(i+1,len(self.queue)))
@@ -66,8 +65,8 @@ class Queue:
                 timestamp = time.strftime("%Y-%m-%d-%H%M%S")
                 os.makedirs(folder, exist_ok=True)
                 np.save(folder+"/"+sanitize_filename(
-                    self.info[infoindex]["description"]
-                    +" - layers "+str(self.info[infoindex]["netparams"]["hidden_layers"])
+                    self.queue[startindex]["info"]["description"]
+                    +" - layers "+str(self.queue[startindex]["info"]["netparams"]["hidden_layers"])
                     +" - training_size "+str(self.labels.shape[0])
                     +" - epochs "+str(val["params"]["epochs"])
                     +" - learning_rate "+str(val["params"]["learning_rate"])
@@ -76,8 +75,7 @@ class Queue:
                 
                 if i < len(self.queue) - 1:
                     startindex = endindex + 1
-                    infoindex += 1
-                    endindex += self.info[infoindex]["folds"]
+                    endindex += self.queue[startindex]["info"]["folds"]
         
         return self.queue
     
