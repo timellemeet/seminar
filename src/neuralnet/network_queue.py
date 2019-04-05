@@ -41,7 +41,7 @@ class Queue:
 
     def execute(self, save=True, folder="Results"):
         startindex = 0
-        endindex = self.queue[startindex]["info"]["folds"] - 1
+        endindex = self.queue[startindex]["info"]["folds"] -1
         
         for i, val in enumerate(self.queue):
             print("Fitting model %d/%d" %(i+1,len(self.queue)))
@@ -71,7 +71,7 @@ class Queue:
                     +" - epochs "+str(val["params"]["epochs"])
                     +" - learning_rate "+str(val["params"]["learning_rate"])
                     +" - "+timestamp), 
-                        self.queue[startindex:endindex])
+                        self.queue[startindex:endindex+1])
                 
                 if i < len(self.queue) - 1:
                     startindex = endindex + 1
