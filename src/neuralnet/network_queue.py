@@ -17,7 +17,6 @@ class Queue:
 
     def add(self,description,netparams, folds, params):
         for i in range(folds):
-            data = k_fold(self.features, self.labels, k=folds, i=i+1)
             self.queue.append({
                 "description": description + " - Fold "+str(i+1),
                 "network":Network(
@@ -32,8 +31,8 @@ class Queue:
                     netparams["loss_prime"],
                     netparams["activation_alpha"],
                 ),
-                "data":data,
                 "params":params,
+                "fold": i+1,
                 "info": {"description":description, "folds":folds, "netparams":netparams , "params":params },
                 "results":None,
                 "accuracies":None,
@@ -44,20 +43,20 @@ class Queue:
         endindex = self.queue[startindex]["info"]["folds"] -1
         
         for i, val in enumerate(self.queue):
-            print("Fitting model %d/%d" %(i+1,len(self.queue)))
+            print("Fitting model %d/%d %s Layers: %s" %(i+1,len(self.queue),val["description"],str(self.queue[startindex]["info"]["netparams"]["hidden_layers"])))
+            data = k_fold(self.features, self.labels, k=val["info"]["folds"], i=val["fold"])
             self.queue[i]["results"] = val["network"].fit(
-                            val["data"]["x_train"],
-                             val["data"]["y_train"],
-                             val["data"]["x_val"],
-                             val["data"]["y_val"],
-                             val["params"]["epochs"],
-                             val["params"]["learning_rate"],
-                             val["params"]["batch_size"],
-                             val["params"]["momentum"],
-                             val["params"]["weight_decay"])
+                            data["x_train"],
+                            data["y_train"],
+                            data["x_val"],
+                            data["y_val"],
+                            val["params"]["epochs"],
+                            val["params"]["learning_rate"],
+                            val["params"]["batch_size"],
+                            val["params"]["momentum"],
+                            val["params"]["weight_decay"])
             self.queue[i]["accuracies"]= val["network"].accuracy(self.test_features, self.original_test_labels)
             print("Model accuracy ",self.queue[i]["accuracies"])
-            del self.queue[i]["data"]
             
             
             #save folded batch
