@@ -3,16 +3,17 @@ import numpy as np
 from sklearn.metrics import confusion_matrix, accuracy_score
 
 
-def plot_error(error, val_error):
+def plot_error(x1, x2, x1_name='training loss', x2_name='validation loss', x_axis='iteration', y_axis='loss'):
     fig, ax1 = plt.subplots()
-    ax1.plot(error, 'r', label="training loss ({:.6f})".format(error[-1]))
-    ax1.plot(val_error, 'b--', label="validation loss ({:.6f})".format(val_error[-1]))
+    ax1.plot(x1, 'r', label="{} ({:.6f})".format(x1_name, x1[-1]))
+    ax1.plot(x2, 'b--', label="{} ({:.6f})".format(x2_name, x2[-1]))
     ax1.grid(True)
-    ax1.set_xlabel('iteration')
+    ax1.set_xlabel(x_axis)
     ax1.legend(loc="best", fontsize=9)
-    ax1.set_ylabel('loss', color='r')
+    ax1.set_ylabel(y_axis, color='r')
     ax1.tick_params('y', colors='r')
     plt.show()
+
 
 def plot_confusion_matrix(y_true, y_pred, classes,
                           normalize=False,
