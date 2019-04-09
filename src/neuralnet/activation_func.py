@@ -21,6 +21,28 @@ def relu(x):
 def relu_prime(x):
     return (x > 0)*1
 
+
+def reloid(x, alpha):
+    for idx, element in enumerate(x):
+        if element < -alpha:
+            x[idx] = 0
+        if abs(element) < alpha:
+            x[idx] = 0.5*(element+alpha)
+    return x
+
+
+def reloid_prime(x, alpha):
+    new_x = np.zeros(len(x))
+    for idx, element in enumerate(x):
+        if abs(element) < alpha:
+            new_x[idx] = 0.5
+        if abs(element) > alpha:
+            new_x[idx] = 1
+
+    return new_x
+
+
+
 def sigmoid(x):
     """
     @param x input vector z=w'x+b

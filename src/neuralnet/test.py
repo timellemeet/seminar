@@ -3,7 +3,7 @@ import pytest
 import numpy as np
 from neuralnet.loss_func import  *
 from neuralnet.activation_func import *
-from neuralnet.network import Network
+
 
 # Agent tests
 # This checks mostly the simple auxiliary methods as the main algorithm is too complex to unit test and was purely
@@ -48,7 +48,13 @@ def test_sigmoid_activation():
     assert n == x_loss.shape
 
 
+def test_reloid_activation():
 
+    x = [-2,-1,-0.5,0,0.5,1,2]
+    x_reloid = reloid(x,alpha=0.6)
+    assert x_reloid == pytest.approx([0,0,0.05,0.3,0.55,1,2])
+    x_reloid_prime = reloid_prime(x,alpha = 0.6)
+    assert x_reloid_prime == pytest.approx([0,0,0,0.5,0.5,0.5,1,1])
 
 
 
