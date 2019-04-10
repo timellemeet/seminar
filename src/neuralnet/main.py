@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 # from sklearn.metrics import accuracy_score
 from Layer import *
 from network import Network
-from activation_func import tanh, tanh_prime, sigmoid, sigmoid_prime, softmax, softmax_prime, reloid, reloid_prime, relu, relu_prime
+from activation_func import tanh, tanh_prime, sigmoid, sigmoid_prime, softmax, softmax_prime, \
+    reloid, reloid_prime, relu, relu_prime, leaky_relu, leaky_relu_prime
 from loss_func import mse, mse_prime, cross_entropy, cross_entropy_prime
 from data_func import vectorize_labels, k_fold, import_data
 from performance_func import plot_error, plot_confusion_matrix
@@ -31,6 +32,7 @@ batch_size = 1
 weight_decay = 0.01
 momentum = True
 reloid_alpha = 0.5
+leaky_relu_alpha = 0.01
 
 architectures = [[30]]
 for layers in architectures:
@@ -38,9 +40,9 @@ for layers in architectures:
         "hidden_layers": layers,
         "features": features,
         "output_classes": output_classes,
-        "activation": relu,
-        "activation_prime": relu_prime,
-        "activation_alpha": reloid_alpha,
+        "activation": leaky_relu,
+        "activation_prime": leaky_relu_prime,
+        "activation_alpha": leaky_relu_alpha,
         "loss_activation": softmax,
         "loss_activation_prime": softmax_prime,
         "loss": cross_entropy,
@@ -51,7 +53,7 @@ for layers in architectures:
                 "learning_rate": 5e-3,
                 "batch_size": 1,
                 "momentum": False,
-                "weight_decay": 0.01},
+                "weight_decay": 0.},
         description="architecture: "+str(layers)+" training_size: "+str(training_size))
 
 results_queue = queue.execute(save=False)
