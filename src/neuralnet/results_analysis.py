@@ -81,64 +81,40 @@ def extract_performance(models):
                x_axis='epochs', y_axis='validation accuracy')
 
 def operations_plot(models):
-    operations_dict = {}
-    acc_dict = {}
-    layer_list = []
     texts = []
-    mpl.use('pgf')
-    params = {
-        'font.family': 'serif',
-        'text.usetex': True,
-        'text.latex.unicode': True,
-        'pgf.rcfonts': False,
-        'pgf.texsystem': 'xelatex'
-    }
-    mpl.rcParams.update(params)
+    # mpl.use('pgf')
+    # params = {
+    #     'font.family': 'serif',
+    #     'text.usetex': True,
+    #     'text.latex.unicode': True,
+    #     'pgf.rcfonts': False,
+    #     'pgf.texsystem': 'xelatex'
+    # }
+    # mpl.rcParams.update(params)
+    with open('../plots/more than 2 layers.txt', 'w') as writer1:
+        writer1.write(str(('ops', 'acc', 'layer structure')) + '\n')
+        with open('../plots/2 layers.txt', 'w') as writer2:
+            writer2.write(str(('ops', 'acc', 'layer structure')) + '\n')
+            for model in models:
+                acc = model.overall_test_accuracy
+                layers = model.model[0]['info']['netparams']['hidden_layers']
+                operations = 784*layers[0]+10*layers[-1]
+                for hu in layers[1:]:
+                    operations += hu*hu
+                fig = plt.gcf()
+                fig.set_size_inches(15,10)
 
-    for model in models:
-        acc = model.overall_test_accuracy
-        layers = model.model[0]['info']['netparams']['hidden_layers']
-        layer_list.append(layers)
-        operations = 784*layers[0]+10*layers[-1]
-        for hu in layers[1:]:
-            operations += hu*hu
-        operations_dict[str(layers)] = operations
-        acc_dict[str(layers)] = acc
-        fig = plt.gcf()
-        fig.set_size_inches(15,10)
+                if len(layers) == 2:
+                    plt.scatter(operations, acc, color='b')
+                    texts.append(plt.text(operations, acc, str(layers), ha='center', va='bottom'))
+                    writer2.write(str((operations, acc, layers)) + '\n')
+                if len(layers) > 2:
+                    plt.scatter(operations, acc, color='y')
+                    texts.append(plt.text(operations, acc, str(layers), ha='center', va='bottom'))
+                    writer1.write(str((operations, acc, layers)) + '\n')
 
-        if len(layers) == 1:
-            plt.scatter(operations, acc, color='b')
-            texts.append(plt.text(operations, acc, str(layers), ha='center', va='bottom'))
-            print((operations, acc, layers))
-        if len(layers) == 2:
-            plt.scatter(operations, acc, color = 'y')
-            texts.append(plt.text(operations, acc, str(layers), ha='center', va='bottom'))
-    adjust_text(texts, arrowprops=dict(arrowstyle = '->', color = 'red'))
-    plt.title('Test accuracy for base models with two layers and one layer with respect to total parameters')
-    plt.xlabel('Parameters')
-    plt.ylabel('Test accuracy')
-    plt.savefig('../plots/2 layers en 1 layer.pgf')
+    plt.show()
 
-
-
-
-
-    # acc = [x for _,x in sorted(zip(operations_dict.values(),acc_dict.values()))]
-    # ops = sorted(operations_dict.values())
-    # plt.scatter(range(1, len(operations_dict)+1), acc, color = 'b')
-    # plt.scatter(len(operations_dict)+1,acc[-1], color='b')
-    # plt.title('Test accuracy for every base model with respect to total parameters')
-    # plt.xticks(range(len(operations_dict)), ops,  rotation=45)
-    # plt.gca().xaxis.set_major_locator(plt.MaxNLocator(10))
-    # fig = plt.gcf()
-    # fig.set_size_inches(30,30)
-    # texts = []
-    # for i, lst in enumerate([x for _,x in sorted(zip(list(operations_dict.values()),layer_list))]):
-    #     texts.append(plt.text(i+1, acc[i], str(lst), ha='center', va='bottom'))
-    # texts.append(plt.text(len(operations_dict)+1, acc[-1],str(layer_list[-1]), ha= 'center',va='bottom'))
-    # adjust_text(texts, arrowprops=dict(arrowstyle= '->', color = 'red'))
-    # plt.show()
 
 def load_models():
     #returns a list of Model objects
