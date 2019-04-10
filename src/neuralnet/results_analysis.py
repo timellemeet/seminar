@@ -1,10 +1,10 @@
 import numpy as np
 from performance_func import plot_error
-import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 import os
 from adjustText import adjust_text
-
 class Model:
     def __init__(self, path):
         self.model = np.load(path)
@@ -84,6 +84,17 @@ def operations_plot(models):
     operations_dict = {}
     acc_dict = {}
     layer_list = []
+    texts = []
+    mpl.use('pgf')
+    params = {
+        'font.family': 'serif',
+        'text.usetex': True,
+        'text.latex.unicode': True,
+        'pgf.rcfonts': False,
+        'pgf.texsystem': 'xelatex'
+    }
+    mpl.rcParams.update(params)
+
     for model in models:
         acc = model.overall_test_accuracy
         layers = model.model[0]['info']['netparams']['hidden_layers']
@@ -93,23 +104,41 @@ def operations_plot(models):
             operations += hu*hu
         operations_dict[str(layers)] = operations
         acc_dict[str(layers)] = acc
-    acc = [x for _,x in sorted(zip(operations_dict.values(),acc_dict.values()))]
-    ops = sorted(operations_dict.values())
-    plt.scatter(range(1, len(operations_dict)+1), acc)
-    plt.title('Test accuracy for every base model with respect to total parameters')
-    plt.xticks(range(1, len(operations_dict)+1), ops,  rotation=45)
-    plt.gca().xaxis.set_major_locator(plt.MaxNLocator(10))
+        fig = plt.gcf()
+        fig.set_size_inches(15,10)
+
+        if len(layers) == 1:
+            plt.scatter(operations, acc, color='b')
+            texts.append(plt.text(operations, acc, str(layers), ha='center', va='bottom'))
+            print((operations, acc, layers))
+        if len(layers) == 2:
+            plt.scatter(operations, acc, color = 'y')
+            texts.append(plt.text(operations, acc, str(layers), ha='center', va='bottom'))
+    adjust_text(texts, arrowprops=dict(arrowstyle = '->', color = 'red'))
+    plt.title('Test accuracy for base models with two layers and one layer with respect to total parameters')
     plt.xlabel('Parameters')
     plt.ylabel('Test accuracy')
-    fig = plt.gcf()
-    fig.set_size_inches(30,30)
-    texts = []
-    print(list(operations_dict.values()), '\n',layer_list)
-    for i, lst in enumerate([x for _,x in sorted(zip(list(operations_dict.values()),layer_list))]):
-        texts.append(plt.text(i, acc[i], str(lst), ha='center', va='bottom'))
-    texts.append(plt.text(len(operations_dict), acc[-1],str(layer_list[-1]), ha= 'center',va='bottom'))
-    adjust_text(texts, arrowprops=dict(arrowstyle= '->', color = 'red'))
-    plt.show()
+    plt.savefig('../plots/2 layers en 1 layer.pgf')
+
+
+
+
+
+    # acc = [x for _,x in sorted(zip(operations_dict.values(),acc_dict.values()))]
+    # ops = sorted(operations_dict.values())
+    # plt.scatter(range(1, len(operations_dict)+1), acc, color = 'b')
+    # plt.scatter(len(operations_dict)+1,acc[-1], color='b')
+    # plt.title('Test accuracy for every base model with respect to total parameters')
+    # plt.xticks(range(len(operations_dict)), ops,  rotation=45)
+    # plt.gca().xaxis.set_major_locator(plt.MaxNLocator(10))
+    # fig = plt.gcf()
+    # fig.set_size_inches(30,30)
+    # texts = []
+    # for i, lst in enumerate([x for _,x in sorted(zip(list(operations_dict.values()),layer_list))]):
+    #     texts.append(plt.text(i+1, acc[i], str(lst), ha='center', va='bottom'))
+    # texts.append(plt.text(len(operations_dict)+1, acc[-1],str(layer_list[-1]), ha= 'center',va='bottom'))
+    # adjust_text(texts, arrowprops=dict(arrowstyle= '->', color = 'red'))
+    # plt.show()
 
 def load_models():
     #returns a list of Model objects
