@@ -85,8 +85,8 @@ def operations_plot(models):
     acc_dict = {}
     layer_list = []
     for model in models:
-        _, _, _, acc = extract_model(model)
-        layers = model[0]['info']['netparams']['hidden_layers']
+        acc = model.overall_test_accuracy
+        layers = model.model[0]['info']['netparams']['hidden_layers']
         layer_list.append(layers)
         operations = 784*layers[0]+10*layers[-1]
         for hu in layers[1:]:
@@ -95,8 +95,9 @@ def operations_plot(models):
         acc_dict[str(layers)] = acc
     acc = [x for _,x in sorted(zip(operations_dict.values(),acc_dict.values()))]
     ops = sorted(operations_dict.values())
-    plt.scatter(range(len(operations_dict)), acc)
-    plt.xticks(range(len(operations_dict)), ops,  rotation=45)
+    plt.scatter(range(1, len(operations_dict)+1), acc)
+    plt.title('Test accuracy for every base model with respect to total parameters')
+    plt.xticks(range(1, len(operations_dict)+1), ops,  rotation=45)
     plt.gca().xaxis.set_major_locator(plt.MaxNLocator(10))
     plt.xlabel('Parameters')
     plt.ylabel('Test accuracy')
@@ -106,15 +107,17 @@ def operations_plot(models):
     print(list(operations_dict.values()), '\n',layer_list)
     for i, lst in enumerate([x for _,x in sorted(zip(list(operations_dict.values()),layer_list))]):
         texts.append(plt.text(i, acc[i], str(lst), ha='center', va='bottom'))
+    texts.append(plt.text(len(operations_dict), acc[-1],str(layer_list[-1]), ha= 'center',va='bottom'))
     adjust_text(texts, arrowprops=dict(arrowstyle= '->', color = 'red'))
     plt.show()
 
 def load_models():
+    #returns a list of Model objects
     models = []
     for file in os.listdir('../neuralnet/Results/Base/'):
         if file[-4:] != '.npy':
             continue
-        models.append(np.load('../neuralnet/Results/Base/'+file))
+        models.append(Model('../neuralnet/Results/Base/'+file))
     return models
 models = load_models()
 operations_plot(models)
