@@ -91,30 +91,33 @@ def operations_plot(models):
     #     'pgf.texsystem': 'xelatex'
     # }
     # mpl.rcParams.update(params)
-    with open('../plots/more than 2 layers.txt', 'w') as writer1:
+    with open('../plots/2 layers.txt', 'w') as writer1:
         writer1.write(str(('ops', 'acc', 'layer structure')) + '\n')
-        with open('../plots/2 layers.txt', 'w') as writer2:
+        with open('../plots/1 layers.txt', 'w') as writer2:
             writer2.write(str(('ops', 'acc', 'layer structure')) + '\n')
             for model in models:
                 acc = model.overall_test_accuracy
                 layers = model.model[0]['info']['netparams']['hidden_layers']
-                operations = 784*layers[0]+10*layers[-1]
-                for hu in layers[1:]:
-                    operations += hu*hu
+                operations = 784*layers[0]+10*layers[-1] + layers[0] + 10
+                for i in range(1, len(layers)):
+                    #weights + bias
+                    operations += layers[i-1]*layers[i]+layers[i]
+                print("%s has %g operations" %(layers, operations))
                 fig = plt.gcf()
                 fig.set_size_inches(15,10)
 
-                if len(layers) == 2:
+                if len(layers) == 1:
                     plt.scatter(operations, acc, color='b')
                     texts.append(plt.text(operations, acc, str(layers), ha='center', va='bottom'))
-                    writer2.write(str((operations, acc, layers)) + '\n')
-                if len(layers) > 2:
+                    # writer2.write(str((operations, acc, layers)) + '\n')
+                if len(layers) == 2:
                     plt.scatter(operations, acc, color='y')
                     texts.append(plt.text(operations, acc, str(layers), ha='center', va='bottom'))
                     writer1.write(str((operations, acc, layers)) + '\n')
 
+    adjust_text(texts, arrowprops=dict(arrowstyle='->', color='red'))
+    plt.savefig('../plots/1 layer and 2 layers.png')
     plt.show()
-
 
 def load_models():
     #returns a list of Model objects
