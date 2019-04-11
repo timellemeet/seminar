@@ -1,5 +1,5 @@
 import numpy as np
-
+import os
 
 def vectorize_labels(labels):
     vector_labels = np.zeros((len(labels),10))
@@ -9,7 +9,7 @@ def vectorize_labels(labels):
 
 
 def k_fold(training_data,training_labels, k, i):
-    observations,__ = training_labels.shape
+    observations = training_labels.shape[0]
     if observations%k != 0:
         raise Exception("Difficult division, make sure {}%{} is zero".format(observations,k))
     foldsize = int(observations/k)
@@ -25,7 +25,7 @@ def k_fold(training_data,training_labels, k, i):
     }
 
 
-def import_data(size=60000, normalize=True):
+def import_data(size=60000, normalize=True, knearest = False):
     # import data
     dataset = np.load("../dataset.npz")
     training = dataset['arr_0'][:size]  # training_img
@@ -36,8 +36,11 @@ def import_data(size=60000, normalize=True):
     np.random.seed(10)
 
     if normalize:
-        # normalize data
+    # normalize data
         training /= 255
         test /= 255
-
-    return training, labels, test, original_test_labels, test_labels
+    if knearest:
+        return training, dataset['arr_2'][:size], test, original_test_labels, test_labels
+    else:
+        return training, labels, test, original_test_labels, test_labels
+        
