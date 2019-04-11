@@ -9,3 +9,4 @@ cribe
 src/neuralnet/.ipynb_checkpoints/
 ve/
 venv/
+src/knearest/knn[1,3,5,10,20]kfold.joblib

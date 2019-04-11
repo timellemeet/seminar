@@ -15,31 +15,39 @@ def tanh_prime(x):
 
 
 def relu(x):
-    return x * (x > 0)
+    # return x * (x > 0)
+    return np.where(x > 0, x, 0)
 
 
 def relu_prime(x):
-    return (x > 0)*1
+    # return (x > 0)*1
+    return np.where(x > 0, 1, 0)
 
 
 def reloid(x, alpha):
-    for idx, element in enumerate(x):
-        if element < -alpha:
-            x[idx] = 0
-        if abs(element) < alpha:
-            x[idx] = 0.5*(element+alpha)
-    return x
+    half_reloid = np.where(x > alpha, x, 0.5*(x+alpha))
+    return np.where(half_reloid > 0, half_reloid, 0)
 
 
 def reloid_prime(x, alpha):
-    new_x = np.zeros(len(x))
-    for idx, element in enumerate(x):
-        if abs(element) < alpha:
-            new_x[idx] = 0.5
-        if abs(element) > alpha:
-            new_x[idx] = 1
+    half_reloid_prime = np.where(x > alpha, 1, 1/2)
+    return np.where(x > 0, half_reloid_prime, 0)
 
-    return new_x
+
+def leaky_relu(x, alpha):
+    return np.where(x > 0, x, alpha*x)
+
+
+def leaky_relu_prime(x, alpha):
+    return np.where(x > 0, 1, alpha)
+
+
+def param_relu(x, theta):
+    return np.where(x > 0, x, theta*x)
+
+
+def param_relu_prime(x, theta):
+    return np.where(x > 0, 1, theta)
 
 
 
@@ -73,7 +81,7 @@ class ActivationFunction:
         self.func_prime = func_prime
         self.alpha = alpha
         self.parametric = False
-        if act_func == softmax:
+        if act_func == reloid or act_func == leaky_relu:
             self.parametric = True
 
     def forward(self, x):
@@ -83,6 +91,16 @@ class ActivationFunction:
             return self.func(x)
 
     def backward(self, x):
+        if self.parametric:
+            return self.func_prime(x, self.alpha)
+        else:
+            return self.func_prime(x)
+
+    def forward_param(self, x, theta):
+        return self.func(x, self.alpha, theta)
+
+
+    def backward_param(self, x, theta):
         if self.parametric:
             return self.func_prime(x, self.alpha)
         else:
