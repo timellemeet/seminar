@@ -1,10 +1,10 @@
 import numpy as np
 from performance_func import plot_error
-import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 import os
 from adjustText import adjust_text
-
 class Model:
     def __init__(self, path):
         self.model = np.load(path)
@@ -81,34 +81,42 @@ def extract_performance(models):
                x_axis='epochs', y_axis='validation accuracy')
 
 def operations_plot(models):
-    operations_dict = {}
-    acc_dict = {}
-    layer_list = []
-    for model in models:
-        acc = model.overall_test_accuracy
-        layers = model.model[0]['info']['netparams']['hidden_layers']
-        layer_list.append(layers)
-        operations = 784*layers[0]+10*layers[-1]
-        for hu in layers[1:]:
-            operations += hu*hu
-        operations_dict[str(layers)] = operations
-        acc_dict[str(layers)] = acc
-    acc = [x for _,x in sorted(zip(operations_dict.values(),acc_dict.values()))]
-    ops = sorted(operations_dict.values())
-    plt.scatter(range(1, len(operations_dict)+1), acc)
-    plt.title('Test accuracy for every base model with respect to total parameters')
-    plt.xticks(range(1, len(operations_dict)+1), ops,  rotation=45)
-    plt.gca().xaxis.set_major_locator(plt.MaxNLocator(10))
-    plt.xlabel('Parameters')
-    plt.ylabel('Test accuracy')
-    fig = plt.gcf()
-    fig.set_size_inches(30,30)
     texts = []
-    print(list(operations_dict.values()), '\n',layer_list)
-    for i, lst in enumerate([x for _,x in sorted(zip(list(operations_dict.values()),layer_list))]):
-        texts.append(plt.text(i, acc[i], str(lst), ha='center', va='bottom'))
-    texts.append(plt.text(len(operations_dict), acc[-1],str(layer_list[-1]), ha= 'center',va='bottom'))
-    adjust_text(texts, arrowprops=dict(arrowstyle= '->', color = 'red'))
+    # mpl.use('pgf')
+    # params = {
+    #     'font.family': 'serif',
+    #     'text.usetex': True,
+    #     'text.latex.unicode': True,
+    #     'pgf.rcfonts': False,
+    #     'pgf.texsystem': 'xelatex'
+    # }
+    # mpl.rcParams.update(params)
+    with open('../plots/2 layers.txt', 'w') as writer1:
+        writer1.write(str(('ops', 'acc', 'layer structure')) + '\n')
+        with open('../plots/1 layers.txt', 'w') as writer2:
+            writer2.write(str(('ops', 'acc', 'layer structure')) + '\n')
+            for model in models:
+                acc = model.overall_test_accuracy
+                layers = model.model[0]['info']['netparams']['hidden_layers']
+                operations = 784*layers[0]+10*layers[-1] + layers[0] + 10
+                for i in range(1, len(layers)):
+                    #weights + bias
+                    operations += layers[i-1]*layers[i]+layers[i]
+                print("%s has %g operations" %(layers, operations))
+                fig = plt.gcf()
+                fig.set_size_inches(15,10)
+
+                if len(layers) == 1:
+                    plt.scatter(operations, acc, color='b')
+                    texts.append(plt.text(operations, acc, str(layers), ha='center', va='bottom'))
+                    # writer2.write(str((operations, acc, layers)) + '\n')
+                if len(layers) == 2:
+                    plt.scatter(operations, acc, color='y')
+                    texts.append(plt.text(operations, acc, str(layers), ha='center', va='bottom'))
+                    writer1.write(str((operations, acc, layers)) + '\n')
+
+    adjust_text(texts, arrowprops=dict(arrowstyle='->', color='red'))
+    plt.savefig('../plots/1 layer and 2 layers.png')
     plt.show()
 
 def load_models():
