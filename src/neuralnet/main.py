@@ -2,17 +2,6 @@ from results_analysis import Model
 from performance_func import plot_confusion_matrix, heatmatrix
 import numpy as np
 
-# Results = [
-#
-# ]
-#
-# model1 = Model("Results/Crossplot/Baseresults - layers [10, 10] - training_size 60000 - epochs 20 - learning_rate 0.005 - 2019-04-05-183742.npy")
-# model2 = Model("Results/Crossplot/Baseresults - layers [20, 10] - training_size 60000 - epochs 20 - learning_rate 0.005 - 2019-04-05-231446.npy")
-#
-#
-# model2.summary()
-# model2.plot_error()
-
 
 Results = {
     "5010": Model("Results/Crossplot/confusion - layers [50, 10] - training_size 60000 - epochs 20 - learning_rate 0.005 - 2019-04-08-123145.npy"),
@@ -30,15 +19,9 @@ Results = {
     "2010": Model("Results/Crossplot/Baseresults - layers [20, 10] - training_size 60000 - epochs 20 - learning_rate 0.005 - 2019-04-05-231446.npy"),
     "2020": Model("Results/Crossplot/Baseresults - layers [20, 20] - training_size 60000 - epochs 20 - learning_rate 0.005 - 2019-04-05-185412.npy"),
     "1010": Model("Results/Crossplot/Baseresults - layers [10, 10] - training_size 60000 - epochs 20 - learning_rate 0.005 - 2019-04-05-183742.npy"),
-
 }
 
-# for key, value in Results.items():
-#         value.overall_test_accuracy = round(value.overall_test_accuracy,3)
-
 tablevals = np.empty([5, 5], dtype=object)
-# for key, value in Results.items():
-#         print(key, round(value.overall_test_accuracy,3)
 
 #50s
 tablevals[0,0] = round(Results["5050"].overall_test_accuracy,3)
@@ -65,10 +48,5 @@ tablevals[4,3] = round(Results["2010"].overall_test_accuracy,3)
 #10
 tablevals[4,4] = round(Results["1010"].overall_test_accuracy,3)
 
-print(tablevals)
-
-
-
-
 labels = ["50","40","30","20","10"]
-print(heatmatrix(tablevals, labels, labels))
+heatmatrix(tablevals, labels, labels)

@@ -1,5 +1,6 @@
 import numpy as np
 from performance_func import plot_error
+from data_func import import_data
 
 
 class Model:
@@ -36,4 +37,11 @@ class Model:
 
     def plot_error(self):
             plot_error(self.average_training_error, self.average_validation_error)
+            
+    def toplosses(self, amount=10, fold=1):
+        np.random.seed(10)
+        # import data
+        normalize = True
+        training, labels, test, original_test_labels, test_labels = import_data(size=60000, normalize=normalize)
+        self.model[fold-1]["network"].top_losses(test, test_labels, amount)
 
