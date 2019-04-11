@@ -68,16 +68,21 @@ def plot_confusion_matrix(y_true, y_pred, classes,
     fig.tight_layout()
     plt.show()
 
-def heatmatrix(a, ylabels, xlabels, background="black", font="white"):
+def heatmatrix(a, ylabels, xlabels, title="Table Title", background="black", font="white", margin=0.02):
     """Returns a LaTeX bmatrix
 
     :a: numpy array
     :returns: LaTeX bmatrix as a string
     """
-    if len(a.shape) > 2:
+    xlabel = "xlabel"
+    ylabel = "ylabel"
+
+    shape = a.shape
+
+    if len(shape) > 2:
         raise ValueError('tabular can at most display two dimensions')
 
-    columns = "c" * (a.shape[1] + 1)
+    columns = "c" * (shape[1] + 1)
 
     #minimize
     flat_list = []
@@ -85,7 +90,6 @@ def heatmatrix(a, ylabels, xlabels, background="black", font="white"):
         for item in sublist:
             if item != None: flat_list.append(item)
 
-    margin = 0.02
     lb = min(flat_list) * (1 - margin)
     ub = max(flat_list) * (1 + margin)
     def cellvalue(x):
@@ -99,11 +103,14 @@ def heatmatrix(a, ylabels, xlabels, background="black", font="white"):
 
     rv = [r'\begin{table}[h!]']
     rv += [r'\centering']
+    rv += [r'\captionof{table}{'+title+'} ']
     rv += [r'\begin{tabular}{'+columns+'}'] #columns[:-1]
+    rv += [" & " + ' & '.join(xlabels)+ r"\\ "]
     for i, line in enumerate(a):
         rv += [ylabels[i] + " & " +' & '.join(line)+ r"\\ "] #\hline
 
-    rv += [" & " + ' & '.join(xlabels)]
+    #rv = rv[:-5]
     rv +=  [r'\end{tabular}']
     rv += [r'\end{table}']
-    return '\n'.join(rv)
+    print('\n'.join(rv))
+
