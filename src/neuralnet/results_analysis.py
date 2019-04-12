@@ -143,8 +143,8 @@ def load_models(path):
             continue
         models.append(Model(path+file))
     return models
-# models = load_models()
-# operations_plot(models)
+models = load_models('../neuralnet/Results/OverFit/')
+# operations_plot(m odels)
 # filename = "testing architectures - layers [100] - training_size 60000 - epochs 20 - learning_rate 0.005 - 2019-04-05-054805.npy"
 # x = np.load("Results/TimsGroteBenchmark/"+filename)
 # filename2 = "testing architectures - layers [100, 90] - training_size 60000 - epochs 20 - learning_rate 0.005 - 2019-04-05-000259.npy"
