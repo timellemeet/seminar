@@ -46,8 +46,8 @@ class Model:
         #plot_error(average_training_error, average_validation_error)
         #return [average_training_error, average_validation_error, average_validation_accuracy, overall_test_accuracy]
 
-    def plot_error(self):
-            plot_error(self.average_training_error, self.average_validation_error)
+    def plot_error(self, save=''):
+            plot_error(self.average_training_error, self.average_validation_error, save)
             
     def toplosses(self, amount=10, fold=1):
         np.random.seed(10)
@@ -135,16 +135,16 @@ def operations_plot(models):
     plt.savefig('../plots/1 layer and 2 layers.png')
     plt.show()
 
-def load_models():
+def load_models(path):
     #returns a list of Model objects
     models = []
-    for file in os.listdir('../neuralnet/Results/Base/'):
+    for file in os.listdir(path):
         if file[-4:] != '.npy':
             continue
-        models.append(Model('../neuralnet/Results/Base/'+file))
+        models.append(Model(path+file))
     return models
-models = load_models()
-operations_plot(models)
+# models = load_models()
+# operations_plot(models)
 # filename = "testing architectures - layers [100] - training_size 60000 - epochs 20 - learning_rate 0.005 - 2019-04-05-054805.npy"
 # x = np.load("Results/TimsGroteBenchmark/"+filename)
 # filename2 = "testing architectures - layers [100, 90] - training_size 60000 - epochs 20 - learning_rate 0.005 - 2019-04-05-000259.npy"
