@@ -148,8 +148,3 @@ def list_models(models):
     
 # models = load_models()
 # operations_plot(models)
-# filename = "testing architectures - layers [100] - training_size 60000 - epochs 20 - learning_rate 0.005 - 2019-04-05-054805.npy"
-# x = np.load("Results/TimsGroteBenchmark/"+filename)
-# filename2 = "testing architectures - layers [100, 90] - training_size 60000 - epochs 20 - learning_rate 0.005 - 2019-04-05-000259.npy"
-# y = np.load("Results/TimsGroteBenchmark/"+filename2)
-# extract_performance([x, y])
