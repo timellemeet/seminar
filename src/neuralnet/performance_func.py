@@ -1,18 +1,23 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import confusion_matrix, accuracy_score
+import matplotlib2tikz
 
 
-def plot_error(error, val_error):
+def plot_error(x1, x2, x1_name='training loss', x2_name='validation loss', x_axis='iteration', y_axis='loss', save =''):
     fig, ax1 = plt.subplots()
-    ax1.plot(error, 'r', label="training loss ({:.6f})".format(error[-1]))
-    ax1.plot(val_error, 'b--', label="validation loss ({:.6f})".format(val_error[-1]))
+    ax1.plot(x1, 'r', label="{} ({:.6f})".format(x1_name, x1[-1]))
+    ax1.plot(x2, 'b--', label="{} ({:.6f})".format(x2_name, x2[-1]))
     ax1.grid(True)
-    ax1.set_xlabel('iteration')
+    ax1.set_xlabel(x_axis)
     ax1.legend(loc="best", fontsize=9)
-    ax1.set_ylabel('loss', color='r')
+    ax1.set_ylabel(y_axis, color='r')
     ax1.tick_params('y', colors='r')
-    plt.show()
+    if save:
+        plt.savefig(save)
+#     plt.show()
+    matplotlib2tikz.save('../plots/wd0.0005[100,90,80,70,60].tex')
+
 
 def plot_confusion_matrix(y_true, y_pred, classes,
                           normalize=False,
@@ -65,4 +70,51 @@ def plot_confusion_matrix(y_true, y_pred, classes,
                     ha="center", va="center",
                     color="white" if cm[i, j] > thresh else "black")
     fig.tight_layout()
-    return ax
+    plt.show()
+
+def heatmatrix(a, ylabels, xlabels, title="Table Title", background="black", font="white", margin=0.02):
+    """Returns a LaTeX bmatrix
+
+    :a: numpy array
+    :returns: LaTeX bmatrix as a string
+    """
+    xlabel = "xlabel"
+    ylabel = "ylabel"
+
+    shape = a.shape
+
+    if len(shape) > 2:
+        raise ValueError('tabular can at most display two dimensions')
+
+    columns = "c" * (shape[1] + 1)
+
+    #minimize
+    flat_list = []
+    for sublist in a:
+        for item in sublist:
+            if item != None: flat_list.append(item)
+
+    lb = min(flat_list) * (1 - margin)
+    ub = max(flat_list) * (1 + margin)
+    def cellvalue(x):
+        if x == None: return ""
+        else:
+            cellcolor = r'\cellcolor{'+background+'!'+str(int(round(100*(x-lb)/(ub-lb))))+'} '
+            cellvalue = r'\textcolor{'+font+'}{'+str(x)+'}'
+            return cellcolor + cellvalue
+
+    a = np.vectorize(cellvalue)(a)
+
+    rv = [r'\begin{table}[h!]']
+    rv += [r'\centering']
+    rv += [r'\captionof{table}{'+title+'} ']
+    rv += [r'\begin{tabular}{'+columns+'}'] #columns[:-1]
+    rv += [" & " + ' & '.join(xlabels)+ r"\\ "]
+    for i, line in enumerate(a):
+        rv += [ylabels[i] + " & " +' & '.join(line)+ r"\\ "] #\hline
+
+    #rv = rv[:-5]
+    rv +=  [r'\end{tabular}']
+    rv += [r'\end{table}']
+    print('\n'.join(rv))
+

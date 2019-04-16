@@ -5,6 +5,7 @@ import datetime
 from Layer import *
 from sklearn.metrics import accuracy_score
 from loss_func import cross_entropy
+from activation_func import ActivationFunction
 import matplotlib.pyplot as plt
 
 class Network:
@@ -12,17 +13,17 @@ class Network:
                   features, output_classes,
                   activation, activation_prime,
                   loss_activation, loss_activation_prime,
-                  loss, loss_prime):
+                  loss, loss_prime, activation_alpha=None):
         self.layers = []
         self.loss = None
         self.loss_prime = None
         # fill it with several layers
         self.add(FCLayer(features, hidden_layers[0]))
-        self.add(ActivationLayer(activation, activation_prime))
+        self.add(ActivationLayer(ActivationFunction(activation, activation_prime, activation_alpha)))
 
         for i in range(1, len(hidden_layers)):
             self.add(FCLayer(hidden_layers[i - 1], hidden_layers[i]))
-            self.add(ActivationLayer(activation, activation_prime))
+            self.add(ActivationLayer(ActivationFunction(activation, activation_prime, activation_alpha)))
 
         self.add(FCLayer(hidden_layers[-1], output_classes))
         self.add(LossLayer(loss_activation, loss_activation_prime, loss, loss_prime))
@@ -104,14 +105,15 @@ class Network:
             epoch_time = time.time()-start_time
             epoch_times.append(epoch_time)
             epoch_time = np.mean(epoch_times)
-            time_pred_error = epoch_time-previous_epoch_time
             eta = str(datetime.timedelta(seconds=round((epoch_time)*(epochs-(i+1)))))
-            print('epoch %d/%d   training error=%f  validation error=%f validation accuracy=%f ETA=%s tpe=%f'  % (i+1, epochs, err, val_error, val_acc, eta, time_pred_error))
+            print('epoch %d/%d   training error=%f  validation error=%f validation accuracy=%f ETA=%s'  % (i+1, epochs, err, val_error, val_acc, eta))
             previous_epoch_time = epoch_time
         
-        print('Average epoch computational time: ',np.mean(epoch_times))
+        #average epoch time
+        apt = np.mean(epoch_times)
+        print('Average epoch computational time: ',apt)
         
-        return [errors, val_errors, val_accs]
+        return {"errors":errors, "val_errors":val_errors, "val_accs":val_accs, "apt":apt}
 
     def train_epoch(self, i, x_shuffle, y_shuffle, samples, learning_rate, batch_size, momentum, weight_decay):
         err = 0

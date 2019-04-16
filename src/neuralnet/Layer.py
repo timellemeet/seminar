@@ -1,5 +1,5 @@
 import numpy as np
-from activation_func import softmax
+from activation_func import softmax, ActivationFunction
 from loss_func import cross_entropy
 # Base class
 class Layer:
@@ -106,21 +106,21 @@ class LossLayer(Layer):
         else:
             return self.loss_prime(y, y_hat) * self.activation_prime(y_hat)
 
+
 # inherit from base class Layer
 class ActivationLayer(Layer):
-    def __init__(self, activation, activation_prime):
+    def __init__(self, activation):
         self.activation = activation
-        self.activation_prime = activation_prime
 
     # returns the activated input
     # also stores both input and output for backprop
     def forward_propagation(self, input_data):
         self.input = input_data
-        output = self.activation(self.input)
+        output = self.activation.forward(self.input)
         return output
 
     # Returns input_error=dE/dX for a given output_error=dE/dY.
     # learning_rate is not used because there is no "learnable" parameters.
     def backward_propagation(self, output_error, learning_rate, batch_size=None):
-        return self.activation_prime(self.input) * output_error
+        return self.activation.backward(self.input) * output_error
 
