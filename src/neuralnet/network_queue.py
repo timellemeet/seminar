@@ -69,9 +69,9 @@ class Queue:
                     +" - training_size "+str(self.labels.shape[0])
                     +" - epochs "+str(val["params"]["epochs"])
                     +" - learning_rate "+str(val["params"]["learning_rate"])
-                    +" - batch_size +str(val['params']['batch_size'])"
-                    +" - momentum +str(val['params']['momentum'])"
-                    +" - weight_decay +str(val['params']['weight_decay'])"
+                    +" - batch_size "+str(val['params']['batch_size'])
+                    +" - momentum "+str(val['params']['momentum'])
+                    +" - weight_decay "+str(val['params']['weight_decay'])
                     +" - "+timestamp), 
                         self.queue[startindex:endindex+1])
                 

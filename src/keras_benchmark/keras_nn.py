@@ -5,6 +5,8 @@ from keras.datasets import mnist
 from keras.utils import to_categorical
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPool2D, Dense, Flatten, Dropout
+from sklearn.metrics import accuracy_score
+import numpy as np
 
 
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
@@ -22,7 +24,7 @@ y_train = to_categorical(y_train, 10)
 y_test = to_categorical(y_test, 10)
 
 model = Sequential()
-model.add(Dense(30, activation='relu', input_shape=(784,)))
+model.add(Dense(300, activation='relu', input_shape=(784,)))
 model.add(Dense(10, activation='softmax'))
 
 model.compile(
@@ -31,8 +33,8 @@ model.compile(
     metrics=['accuracy']
 )
 
-epochs = 50
-batch_size = 316
+epochs = 20
+batch_size = 32
 history = model.fit(x=x_train, y=y_train, batch_size=batch_size, epochs=epochs, validation_data=(x_test, y_test))
 
 plt.plot(history.history['acc'], label='training accuracy')
@@ -50,3 +52,5 @@ plt.title('Loss')
 plt.xlabel('epochs')
 plt.ylabel('loss')
 plt.legend()
+predicted = model.predict(x_test)
+accuracy_score(y_test,np.argmax(predicted))

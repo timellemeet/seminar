@@ -7,12 +7,18 @@ import matplotlib.pyplot as plt
 import os
 from adjustText import adjust_text
 import datetime
+import matplotlib.patches as mpatches
+import matplotlib2tikz
 
 class Model:
     def __init__(self, path):
         self.model = np.load(path)
         folds = self.model[0]['info']['folds']
         epochs = self.model[0]['params']['epochs']
+        self.description = (self.model[0]["info"]["description"]
+            + " - layers " + str(self.model[0]["info"]["netparams"]["hidden_layers"])
+            + " - epochs " + str(epochs)
+            + " - learning_rate " + str(self.model[0]["params"]["learning_rate"]))
         self.average_training_error = np.zeros(epochs)
         self.average_validation_error = np.zeros(epochs)
         self.average_validation_accuracy = np.zeros(epochs)
@@ -34,10 +40,7 @@ class Model:
         self.overall_apt = str(datetime.timedelta(seconds=round(self.overall_apt)))
 
     def summary(self):
-        print(self.model[0]["info"]["description"]
-              + " - layers " + str(self.model[0]["info"]["netparams"]["hidden_layers"])
-              + " - epochs " + str(self.model[0]['params']['epochs'])
-              + " - learning_rate " + str(self.model[0]["params"]["learning_rate"]))
+        print(self.description)
         print("Average_training_error: {} \n Average validation error: {} \n Average validation accuracy: {} \n"
               "Average test_accuracy: {}".format(self.average_training_error, self.average_validation_error,
                                                  self.average_validation_accuracy, self.overall_test_accuracy))
@@ -46,8 +49,8 @@ class Model:
         #plot_error(average_training_error, average_validation_error)
         #return [average_training_error, average_validation_error, average_validation_accuracy, overall_test_accuracy]
 
-    def plot_error(self):
-            plot_error(self.average_training_error, self.average_validation_error)
+    def plot_error(self, save=''):
+            plot_error(self.average_training_error, self.average_validation_error, save)
             
     def toplosses(self, amount=10, fold=1):
         np.random.seed(10)
@@ -75,10 +78,7 @@ def extract_model(model):
     average_validation_accuracy /= folds - 1  # Dit moet terug folds worden als alle 5 folds weer worden opgeslagen
     overall_test_accuracy /= folds - 1  # Dit moet terug folds worden als alle 5 folds weer worden opgeslagen
 
-    print(model[0]["info"]["description"]
-          + " - layers " + str(model[0]["info"]["netparams"]["hidden_layers"])
-          + " - epochs " + str(epochs)
-          + " - learning_rate " + str(model[0]["params"]["learning_rate"]))
+    print()
     print("Average_training_error: {} \n Average validation error: {} \n Average validation accuracy: {} \n"
           "Average test_accuracy: {}".format(average_training_error, average_validation_error,
                                              average_validation_accuracy, overall_test_accuracy))
@@ -135,16 +135,68 @@ def operations_plot(models):
     plt.savefig('../plots/1 layer and 2 layers.png')
     plt.show()
 
-def load_models():
+def load_models(path):
     #returns a list of Model objects
     models = []
-    for file in os.listdir('../neuralnet/Results/Base/'):
+    for file in os.listdir(path):
         if file[-4:] != '.npy':
             continue
-        models.append(Model('../neuralnet/Results/Base/'+file))
+        models.append(Model(path+"/"+file))
     return models
-models = load_models()
-operations_plot(models)
+def list_models(models):
+    for i, val in enumerate(models):
+        print("Key "+str(i)+": "+val.description)
+    
+# models = load_models()
+# operations_plot(models)
+models = load_models('../neuralnet/Results/base/')
+# operations_plot(models)
+for model in models:
+    texts = []
+    acc = model.overall_test_accuracy
+    layers = model.model[0]['info']['netparams']['hidden_layers']
+    operations = 784*layers[0]+10*layers[-1] + layers[0] + 10
+    for i in range(1, len(layers)):
+        #weights + bias
+        operations += layers[i-1]*layers[i]+layers[i]
+    if len(layers) <= 2 and layers[0]<=200:
+        plt.plot(operations, acc,marker='o',markersize=4, color='b')
+#         texts.append(plt.text(operations, acc, str(layers), ha='center', va='bottom'))
+
+models_wd = load_models('../neuralnet/Results/Base/WeightDecay/')
+for model in models_wd:
+    texts = []
+    acc = model.overall_test_accuracy
+    layers = model.model[0]['info']['netparams']['hidden_layers']
+    operations = 784*layers[0]+10*layers[-1] + layers[0] + 10
+    for i in range(1, len(layers)):
+        #weights + bias
+        operations += layers[i-1]*layers[i]+layers[i]
+    fig = plt.gcf()
+    fig.set_size_inches(15,10)
+
+    if model.model[0]['info']['params']['weight_decay'] == 0.0005:
+        plt.plot(operations, acc,marker='o',markersize=4, color='y')
+#         texts.append(plt.text(operations, acc, str(layers), ha='center', va='bottom'))
+    elif model.model[0]['info']['params']['weight_decay'] == 0.001:
+        plt.plot(operations, acc, marker='o',markersize=4,color='g')
+#         texts.append(plt.text(operations, acc, str(layers), ha='center', va='bottom'))
+    elif model.model[0]['info']['params']['weight_decay'] == 0.005:
+        plt.plot(operations, acc, marker='o',markersize=4,color='m')
+#         texts.append(plt.text(operations, acc, str(layers), ha='center', va='bottom'))
+    elif model.model[0]['info']['params']['weight_decay'] == 0.01:
+        plt.plot(operations, acc, marker='o',markersize=4,color='r')
+#         texts.append(plt.text(operations, acc, str(layers), ha='center', va='bottom'))
+red_patch = mpatches.Patch(color='r', label='wd = 0.01')
+green_patch = mpatches.Patch(color='g', label='wd = 0.001')
+mag_patch = mpatches.Patch(color='m', label='wd = 0.005')
+yellow_patch = mpatches.Patch(color='y', label='wd = 0.0005')
+blue_patch = mpatches.Patch(color='b', label='wd = 0')
+patches = [red_patch, mag_patch, green_patch,yellow_patch, blue_patch]
+legend = plt.gca().legend(handles=patches,loc='lower right')
+
+# plt.legend(['lr=0.0001','lr=0.0005','lr=0.001','lr=0.005','lr=0.01'])
+matplotlib2tikz.save('../plots/wd.tex')
 # filename = "testing architectures - layers [100] - training_size 60000 - epochs 20 - learning_rate 0.005 - 2019-04-05-054805.npy"
 # x = np.load("Results/TimsGroteBenchmark/"+filename)
 # filename2 = "testing architectures - layers [100, 90] - training_size 60000 - epochs 20 - learning_rate 0.005 - 2019-04-05-000259.npy"
