@@ -100,10 +100,11 @@ for layers in architectures:
                 "learning_rate": 5e-3,
                 "batch_size": 1,
                 "momentum": False,
-                "weight_decay": 0.},
-        description="architecture: "+str(layers)+" training_size: "+str(training_size))
+                "weight_decay": 0.005},
+        description="over fit model, training set = 3000")
 
-results_queue = queue.execute(save=True, folder='Results/OverFit/')
+
+results_queue = queue.execute(save=True, folder='Results/OverFit')
 
 # # prepare data for training by selecting validation set
 # fold_train_data, fold_train_labels, fold_val_data, fold_val_labels = k_fold(training, labels, k=5, n=5)

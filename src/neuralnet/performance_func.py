@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import confusion_matrix, accuracy_score
+import matplotlib2tikz
 
 
 def plot_error(x1, x2, x1_name='training loss', x2_name='validation loss', x_axis='iteration', y_axis='loss', save =''):
