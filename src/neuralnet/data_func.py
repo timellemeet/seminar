@@ -10,8 +10,19 @@ def vectorize_labels(labels):
 
 def k_fold(training_data,training_labels, k, i):
     observations = training_labels.shape[0]
-    if observations%k != 0:
-        raise Exception("Difficult division, make sure {}%{} is zero".format(observations,k))
+    if observations % k != 0:
+        raise Exception("Difficult division, make sure {}%{} is zero".format(observations, k))
+    if k == 1:
+        foldsize = int(observations / 5)
+        validation_data = training_data[0:foldsize]
+        validation_labels = training_labels[0:foldsize]
+        new_training_data = training_data[foldsize:]
+        new_training_labels = training_labels[foldsize:]
+        return {"x_train":new_training_data,
+                "y_train":new_training_labels,
+                "x_val":validation_data,
+                "y_val":validation_labels
+                }
     foldsize = int(observations/k)
     validation_data = training_data[(i-1)*foldsize:i*foldsize]
     validation_labels = training_labels[(i-1)*foldsize:i*foldsize]

@@ -86,8 +86,11 @@ class Network:
             raise Exception("Make sure samples ({}) % batch_size ({}) is 0, now {}".format(samples, batch_size, samples%batch_size))
         
         previous_epoch_time = 0
+        current_epoch = 0
+        improving = True
         # training loop
-        for i in range(epochs):
+        while improving and current_epoch < epochs:
+            current_epoch += 1
             start_time = time.time()
             seed = np.arange(samples)
             np.random.shuffle(seed)
@@ -95,18 +98,22 @@ class Network:
             y_shuffle = y_train[seed]
 
             # train one epoch
-            err = self.train_epoch(i, x_shuffle, y_shuffle, samples, learning_rate, batch_size, momentum, weight_decay)
+            err = self.train_epoch(x_shuffle, y_shuffle, samples, learning_rate, batch_size, momentum, weight_decay)
             
             # validate and save to epoch error lists
             val_error, val_acc = self.validate(x_val, y_val, self.layers[-1].loss)
             val_errors.append(val_error)
             val_accs.append(val_acc)
             errors.append(err)
+
+            previous_five = val_errors[-5:]
+            if len(previous_five) == 5 and np.argmin(previous_five) == 0:
+                improving = False
             epoch_time = time.time()-start_time
             epoch_times.append(epoch_time)
             epoch_time = np.mean(epoch_times)
-            eta = str(datetime.timedelta(seconds=round((epoch_time)*(epochs-(i+1)))))
-            print('epoch %d/%d   training error=%f  validation error=%f validation accuracy=%f ETA=%s'  % (i+1, epochs, err, val_error, val_acc, eta))
+            eta = str(datetime.timedelta(seconds=round((epoch_time)*(epochs-(current_epoch+1)))))
+            print('epoch %d/%d   training error=%f  validation error=%f validation accuracy=%f ETA=%s'  % (current_epoch, epochs, err, val_error, val_acc, eta))
             previous_epoch_time = epoch_time
         
         #average epoch time
@@ -115,7 +122,7 @@ class Network:
         
         return {"errors":errors, "val_errors":val_errors, "val_accs":val_accs, "apt":apt}
 
-    def train_epoch(self, i, x_shuffle, y_shuffle, samples, learning_rate, batch_size, momentum, weight_decay):
+    def train_epoch(self, x_shuffle, y_shuffle, samples, learning_rate, batch_size, momentum, weight_decay):
         err = 0
         for k in range(1, samples // batch_size):
             start_slice = (k - 1) * batch_size
