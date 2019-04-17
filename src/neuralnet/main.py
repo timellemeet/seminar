@@ -100,8 +100,8 @@ for layers in architectures:
                 "learning_rate": 5e-3,
                 "batch_size": 1,
                 "momentum": False,
-                "weight_decay": 0.005},
-        description="over fit model, training set = 3000")
+                "weight_decay": 0.0005},
+        description="over fit model, training set 3000")
 
 
 results_queue = queue.execute(save=True, folder='Results/OverFit')
