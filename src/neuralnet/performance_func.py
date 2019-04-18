@@ -15,7 +15,8 @@ def plot_error(x1, x2, x1_name='training loss', x2_name='validation loss', x_axi
     ax1.tick_params('y', colors='r')
     if save:
         plt.savefig(save)
-    plt.show()
+#     plt.show()
+    matplotlib2tikz.save('../plots/wd0.0005[100,90,80,70,60].tex')
 
 
 def plot_confusion_matrix(y_true, y_pred, classes,
