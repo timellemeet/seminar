@@ -13,6 +13,10 @@ class Model:
         self.model = np.load(path)
         folds = self.model[0]['info']['folds']
         epochs = self.model[0]['params']['epochs']
+        self.description = (self.model[0]["info"]["description"]
+            + " - layers " + str(self.model[0]["info"]["netparams"]["hidden_layers"])
+            + " - epochs " + str(epochs)
+            + " - learning_rate " + str(self.model[0]["params"]["learning_rate"]))
         self.average_training_error = np.zeros(epochs)
         self.average_validation_error = np.zeros(epochs)
         self.average_validation_accuracy = np.zeros(epochs)
@@ -34,10 +38,7 @@ class Model:
         self.overall_apt = str(datetime.timedelta(seconds=round(self.overall_apt)))
 
     def summary(self):
-        print(self.model[0]["info"]["description"]
-              + " - layers " + str(self.model[0]["info"]["netparams"]["hidden_layers"])
-              + " - epochs " + str(self.model[0]['params']['epochs'])
-              + " - learning_rate " + str(self.model[0]["params"]["learning_rate"]))
+        print(self.description)
         print("Average_training_error: {} \n Average validation error: {} \n Average validation accuracy: {} \n"
               "Average test_accuracy: {}".format(self.average_training_error, self.average_validation_error,
                                                  self.average_validation_accuracy, self.overall_test_accuracy))
@@ -46,8 +47,8 @@ class Model:
         #plot_error(average_training_error, average_validation_error)
         #return [average_training_error, average_validation_error, average_validation_accuracy, overall_test_accuracy]
 
-    def plot_error(self):
-            plot_error(self.average_training_error, self.average_validation_error)
+    def plot_error(self, save=''):
+            plot_error(self.average_training_error, self.average_validation_error, save)
             
     def toplosses(self, amount=10, fold=1):
         np.random.seed(10)
@@ -75,10 +76,7 @@ def extract_model(model):
     average_validation_accuracy /= folds - 1  # Dit moet terug folds worden als alle 5 folds weer worden opgeslagen
     overall_test_accuracy /= folds - 1  # Dit moet terug folds worden als alle 5 folds weer worden opgeslagen
 
-    print(model[0]["info"]["description"]
-          + " - layers " + str(model[0]["info"]["netparams"]["hidden_layers"])
-          + " - epochs " + str(epochs)
-          + " - learning_rate " + str(model[0]["params"]["learning_rate"]))
+    print()
     print("Average_training_error: {} \n Average validation error: {} \n Average validation accuracy: {} \n"
           "Average test_accuracy: {}".format(average_training_error, average_validation_error,
                                              average_validation_accuracy, overall_test_accuracy))
@@ -135,18 +133,18 @@ def operations_plot(models):
     plt.savefig('../plots/1 layer and 2 layers.png')
     plt.show()
 
-def load_models():
+def load_models(path):
     #returns a list of Model objects
     models = []
-    for file in os.listdir('../neuralnet/Results/Base/'):
+    for file in os.listdir(path):
         if file[-4:] != '.npy':
             continue
-        models.append(Model('../neuralnet/Results/Base/'+file))
+        models.append(Model(path+"/"+file))
     return models
-models = load_models()
-operations_plot(models)
-# filename = "testing architectures - layers [100] - training_size 60000 - epochs 20 - learning_rate 0.005 - 2019-04-05-054805.npy"
-# x = np.load("Results/TimsGroteBenchmark/"+filename)
-# filename2 = "testing architectures - layers [100, 90] - training_size 60000 - epochs 20 - learning_rate 0.005 - 2019-04-05-000259.npy"
-# y = np.load("Results/TimsGroteBenchmark/"+filename2)
-# extract_performance([x, y])
+
+def list_models(models):
+    for i, val in enumerate(models):
+        print("Key "+str(i)+": "+val.description)
+    
+# models = load_models()
+# operations_plot(models)

@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import confusion_matrix, accuracy_score
+import matplotlib2tikz
 
 
-def plot_error(x1, x2, x1_name='training loss', x2_name='validation loss', x_axis='iteration', y_axis='loss'):
+def plot_error(x1, x2, x1_name='training loss', x2_name='validation loss', x_axis='iteration', y_axis='loss', save =''):
     fig, ax1 = plt.subplots()
     ax1.plot(x1, 'r', label="{} ({:.6f})".format(x1_name, x1[-1]))
     ax1.plot(x2, 'b--', label="{} ({:.6f})".format(x2_name, x2[-1]))
@@ -12,6 +13,8 @@ def plot_error(x1, x2, x1_name='training loss', x2_name='validation loss', x_axi
     ax1.legend(loc="best", fontsize=9)
     ax1.set_ylabel(y_axis, color='r')
     ax1.tick_params('y', colors='r')
+    if save:
+        plt.savefig(save)
     plt.show()
 
 
