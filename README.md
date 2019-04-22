@@ -25,5 +25,5 @@ The data was downloaded directly from the LeCun website, however this was not in
 A python library was used to open and parse the data into a csv file. Loading csvs into numpy is quite slow, so instead we loaded it once,
 and then saved it using the savez function from numpy. To load it, we built the import_data function located in the data_func file.
 Sadly, the file was too large to push onto github, and instead we uploaded it onto google drive. Here is a link to download the .npz file,
-place it in the src folder. https://drive.google.com/file/d/1YxNhsyUG9VIMUmjHJelIkU5mWOllsB-F/view?usp=drivesdk
+place it in the src folder. https://drive.google.com/open?id=1YxNhsyUG9VIMUmjHJelIkU5mWOllsB-F
 
